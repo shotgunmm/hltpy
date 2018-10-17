@@ -1,0 +1,50 @@
+@import '~@material/drawer/dist/mdc.drawer.css';
+@import '~@rmwc/circular-progress/circular-progress.css';
+@import '~@rmwc/data-table/data-table.css';
+@import '~material-components-web/dist/material-components-web.min.css';
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: Roboto, sans-serif;
+}
+
+.root {
+  min-height: 100vh;
+}
+
+.body-split {
+  overflow: hidden;
+  display: flex;
+
+
+  .mdc-drawer-app-content {
+    flex-grow: 10;
+  }
+}
+
+.corner-fab {
+  position: fixed;
+  bottom: 2rem; 
+  right: 2rem;
+}
+
+.contact-body {
+  background: #ddd;
+  padding: 1.5rem;
+}
+
+.pull-right {
+  float: right;
+}
+
+.contact-section {
+  padding: 0.5rem 1rem 0;
+  background: white;
+  margin-bottom: 1rem;
+}
+
+.contact-section-edit {
+  margin: 0.25rem 0;
+}

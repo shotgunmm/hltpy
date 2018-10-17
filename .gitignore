@@ -1,0 +1,5 @@
+node_modules
+__pycache__
+*.swp
+env
+db.sqlite3
