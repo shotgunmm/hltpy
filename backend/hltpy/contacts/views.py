@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
@@ -21,40 +23,27 @@ def index(request):
 
 @login_required
 def all_contacts(request):
+    if 'POST' == request.method:
+        return get_contact(request)
+
     return render_json({'items': [_.as_json() for _ in Contact.objects.all()]})
 
 
 @login_required
 def get_contact(request, contact_id=None):
-    contact = get_object_or_404(Contact, id=contact_id)
-
+    if 'GET' == request.method:
+        contact = get_object_or_404(Contact, id=contact_id)
     if 'POST' == request.method:
-        action = request.POST['action']
-        success = False
-        if action == 'note':
-            contact.event_set.create(kind='note', note=request.POST['note'])
-            success = True
-        elif action == 'update':
-            field = request.POST['field']
-            new_value = request.POST['value']
-            assert field in ALLOWED_FIELDS
-            old_value = getattr(contact, field)
+        contact = get_object_or_404(Contact, id=contact_id) if contact_id else Contact(owner=request.user)
 
-            contact.event_set.create(kind='field_change', owner=request.user, field_changed=field, value_before=old_value, value_after=new_value)
+        data = json.loads(request.body)
+        for field, value in data.items():
+            if field in ALLOWED_FIELDS:
+                setattr(contact, field, str(value))
+        
+        contact.save()
 
-            Contact.objects.filter(id=contact.id).update(updated=timezone.now(), **{field: new_value})
-            setattr(contact, field, new_value)
-            success = True
-
-        if not success:
-            return render_json({'success': False}, status=400)
+        if 'note' in data:
+            contact.event_set.create(owner=request.user, kind='note', note=data['note'])
 
     return render_json({'item': contact.as_json(events=True)})
-    
-
-@login_required
-def create_contact(request):
-    fields = {field:value for field, value in request.POST.items() if field in ALLOWED_FIELDS}
-    contact = Contact.objects.create(owner=request.user, **fields)
-
-    return render_json({'contact': contact.as_json(events=True)})

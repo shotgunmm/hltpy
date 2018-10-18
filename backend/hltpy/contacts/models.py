@@ -40,7 +40,7 @@ class Contact(models.Model):
                          'workplace', 'position', 'created', 'updated')
 
         if events:
-            result['events'] = [_.as_json() for _ in self.event_set.all()]
+            result['events'] = [_.as_json() for _ in self.event_set.all().order_by('-created')]
 
         return result
 
@@ -65,4 +65,4 @@ class ContactEvent(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def as_json(self):
-        return extract(self, 'kind', 'field_changed', 'value_before', 'value_after', 'note', 'created')
+        return extract(self, 'id', 'kind', 'field_changed', 'value_before', 'value_after', 'note', 'created')

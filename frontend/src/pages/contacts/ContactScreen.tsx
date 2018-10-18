@@ -44,7 +44,7 @@ export default class ContactScreen extends React.Component<{}, State> {
   renderBody = () => this.state.items.map(this.renderRow);
 
   renderRow = (value: Contact) => (
-    <DataTableRow> 
+    <DataTableRow key={value.id}> 
       <DataTableCell>
         {value.first_name} {value.last_name}
         <br /> <b>{value.state}</b>

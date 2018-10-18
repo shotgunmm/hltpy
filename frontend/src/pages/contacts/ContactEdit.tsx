@@ -17,10 +17,12 @@ type Props = RouteComponentProps<{ id: string }>;
 
 type State = {
   value: Contact
+  changes: {}
   loading: boolean
   expandedSection: string | null
   isNew: boolean
   newNote: string
+  saving: boolean
 };
 
 export default class ContactEdit extends React.Component<Props, State> {
@@ -37,9 +39,11 @@ export default class ContactEdit extends React.Component<Props, State> {
     const { id } = this.props.match.params;
     this.setState({
       value: {} as Contact,
+      saving: false,
       loading: true,
       expandedSection: null,
       isNew: false,
+      changes: {},
       newNote: ''
     });
     if (id) {
@@ -65,12 +69,22 @@ export default class ContactEdit extends React.Component<Props, State> {
     return (event: any) => {
       const { value } = this.state;
       value[key] = event.target.value;
-      this.setState({ value: value });
+      const changes = { ...this.state.changes, [key]: event.target.value }
+      this.setState({ value: value, changes: changes });
     };
   };
 
+
+  saveSection = () => {
+    const { value, changes } = this.state
+    const url = value.id ? `/contacts/${value.id}` : '/contacts'
+
+    api.post(url, changes)
+      .then(response => this.setState({value: response.data.item, changes: [], expandedSection: null}))
+  }
+
   renderSection = (label: string, icon: string, fields: FieldDescription[]) => {
-    const { expandedSection, value } = this.state;
+    const { expandedSection, value, saving } = this.state;
     if (expandedSection !== label) {
       const setFields = fields.filter(field => value[field.key]);
 
@@ -105,24 +119,26 @@ export default class ContactEdit extends React.Component<Props, State> {
         <Elevation key={label} className="contact-section" z={6}>
           <h3 className="mdc-typography--subtitle2">
             {label}
-            <Button onClick={this.setSection(null)}>
+            <Button onClick={this.saveSection}>
               <ButtonIcon>save</ButtonIcon> Save
             </Button>
           </h3>
-          <List>
-            {fields.map(field => (
-              <div key={field.key}>
-                <TextField
-                  style={{ width: "50%" }}
-                  withLeadingIcon={icon}
-                  key={field.key}
-                  label={field.label}
-                  value={value[field.key] || ""}
-                  onChange={this.onSetValue(field.key)}
-                />
-              </div>
-            ))}
-          </List>
+          {saving ? <CircularProgress /> :
+            <List>
+              {fields.map(field => (
+                <div key={field.key}>
+                  <TextField
+                    style={{ width: "50%" }}
+                    withLeadingIcon={icon}
+                    key={field.key}
+                    label={field.label}
+                    value={value[field.key] || ""}
+                    onChange={this.onSetValue(field.key)}
+                  />
+                </div>
+              ))}
+            </List>
+          }
         </Elevation>
       );
     }
@@ -132,10 +148,13 @@ export default class ContactEdit extends React.Component<Props, State> {
 
   saveNote = (event: any) => {
     const { value, newNote } = this.state
+    if (!value.id) {
+      alert("Please save this contact before creating a note.");
+      return;
+    }
     if (newNote.length > 1) {
-      const events = [...(value.events || [])]
-      events.push({ id: new Date().toISOString(), kind: 'note', note: newNote, field_changed: null, extra: null, value_before: null, value_after: null, created: new Date().toISOString() })
-      this.setState({ value: { ...value, events }, newNote: '' })
+      api.post(`/contacts/${value.id}`, { note: newNote })
+        .then(response => this.setState({value: response.data.item, newNote: ''}))
     } else {
       this.setState({newNote: ''})
     }
@@ -209,6 +228,11 @@ export default class ContactEdit extends React.Component<Props, State> {
             { key: "phone_mobile", label: "Mobile" },
             { key: "phone_home", label: "Home" },
             { key: "phone_times", label: "Best time to call" }
+          ])}
+          {this.renderSection("Home Address", "location_on", [
+            { key: "address_street", label: "Street Address" },
+            { key: "address_city", label: "City" },
+            { key: "address_state", label: "State" }
           ])}
           {this.renderNotesSection()}
         </div>
