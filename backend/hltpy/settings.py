@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['*'] if DEBUG else []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -46,6 +45,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'hltpy.auth.integrations.LaravelAuthMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -71,6 +71,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'hltpy.wsgi.application'
+AUTH_USER_MODEL = 'hltpy.auth.User'
 
 
 # Database
@@ -80,6 +81,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'legacy': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'humanlif_hlt1',
+        'USER': 'root',
+        'PASSWORD': '',
     }
 }
 
@@ -102,6 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_BACKENDS = [
+    'hltpy.auth.integrations.LaravelAuthBackend',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -121,3 +131,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LARAVEL_SESSION_COOKIE = 'laravel_session'
