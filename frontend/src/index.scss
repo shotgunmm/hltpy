@@ -8,6 +8,29 @@ body {
   padding: 0;
   min-height: 100vh;
   font-family: Roboto, sans-serif;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+$primary: #1976d2;
+
+.mdc-top-app-bar {
+  color: $primary;
+  background: white;
+}
+
+.mdc-drawer__content {
+  height: 100%;
+  background: $primary;
+  flex: 0 0;
+  .mdc-list-item, .mdc-list-item__graphic {
+    color: white;
+  }
+}
+
+.rmwc-data-table__content {
+  width: 100%;
 }
 
 .root {
@@ -21,6 +44,7 @@ body {
 
   .mdc-drawer-app-content {
     flex-grow: 10;
+    flex: 1;
   }
 }
 
@@ -31,7 +55,7 @@ body {
 }
 
 .contact-body {
-  background: #ddd;
+  background: #efebe9;
   padding: 1.5rem;
 }
 
@@ -39,12 +63,35 @@ body {
   float: right;
 }
 
+.contact-header {
+  background: $primary;
+  color: white;
+  padding: 1rem 2rem 2rem;
+}
+
 .contact-section {
-  padding: 0.5rem 1rem 0;
+  padding: 0.5rem 0.5rem 1rem 0.5rem;
   background: white;
   margin-bottom: 1rem;
+
+  .mdc-list-item {
+    height: auto;
+  }
+  .mdc-list-item__icon {
+    margin-right: 0.5rem;
+  }
+
 }
 
 .contact-section-edit {
-  margin: 0.25rem 0;
+  .mdc-text-field__input{
+    padding-left: 68px;
+  }
+ .mdc-floating-label {
+   padding-left: 20px;
+ }
+ .mdc-floating-label--float-above {
+   padding-left: 26px;
+ }
+
 }

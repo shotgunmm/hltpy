@@ -1,8 +1,10 @@
 import base64
 
 import phpserialize
-from django.contrib.auth import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+
+from ..utils import extract
 
 
 def php_object_hook(_name, data):
@@ -16,7 +18,7 @@ class UserManager(BaseUserManager):
         raise NotImplementedError
 
 
-class User(AbstractBaseUser):
+class User(models.Model):
     username = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(unique=True, max_length=255)
     password = models.CharField(max_length=255)
@@ -29,12 +31,25 @@ class User(AbstractBaseUser):
     updated_at = models.DateTimeField()
     deleted_at = models.DateTimeField(blank=True, null=True)
 
+    def as_json(self):
+        return extract(self, 'email', 'id', 'first_name', 'last_name')
+
     #
     # Django Auth module compatibility functions
     #
+    objects = UserManager()
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['password']
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
 
     @property
     def is_active(self):
@@ -45,6 +60,7 @@ class User(AbstractBaseUser):
 
     def get_full_name(self):
         return "{} {}".format(self.first_name, self.last_name)
+
 
     class Meta:
         managed = False

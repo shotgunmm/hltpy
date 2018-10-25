@@ -19,8 +19,8 @@ from django.urls import path
 from .contacts import views as contacts
 
 urlpatterns = [
-    path('', contacts.index),
-    path('admin/', admin.site.urls),
+    path('dashboard', contacts.index),
+    path('dashboard/<path:path>', contacts.index),
     path('api/contacts', contacts.all_contacts),
     path('api/contacts/<int:contact_id>', contacts.get_contact),
 ]

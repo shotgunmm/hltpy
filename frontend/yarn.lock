@@ -4485,6 +4485,13 @@ hoist-non-react-statics@^2.5.0:
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
   integrity sha512-rqcy4pJo55FTTLWt+bU8ukscqHeE/e9KWvsOW2b/a3afxQZhwkQdT1rPPCJ0rYXdj4vNcasY8zHTH+jF/qStxw==
 
+hoist-non-react-statics@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.0.1.tgz#fba3e7df0210eb9447757ca1a7cb607162f0a364"
+  integrity sha512-1kXwPsOi0OGQIZNVMPvgWJ9tSnGMiMfJdihqEzrPEXlHOBh9AAHXX/QYmAJTXztnz/K+PQ8ryCb4eGaN6HlGbQ==
+  dependencies:
+    react-is "^16.3.2"
+
 home-or-tmp@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/home-or-tmp/-/home-or-tmp-2.0.0.tgz#e36c3f2d2cae7d746a857e38d18d5f32a7882db8"
@@ -6258,18 +6265,18 @@ mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkd
   dependencies:
     minimist "0.0.8"
 
-mobx-react@^5.2.5:
-  version "5.2.5"
-  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.2.5.tgz#fc44ac17e1798f6b590f064b831d8a1d89850ef0"
-  integrity sha512-vSwsjGwmaqTmaEsPWET/APccjirTiIIchQA3YVasKzaxIGv62BNJUHFjrkIAbGBLeqJma+ZgSu158OqQLK0vaQ==
+mobx-react@^5.3.5:
+  version "5.3.5"
+  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.3.5.tgz#749d15e569628e5b269b77d8f9e5e540b559e429"
+  integrity sha512-CEdadLjwCEXx7B2WCeoNh2ARtZLThGrP5zonnTAbilUq0sTpd5jInRIPRE+O4+BtK9Cqnnvd6r/Y3SJNT6I2hA==
   dependencies:
-    hoist-non-react-statics "^2.5.0"
+    hoist-non-react-statics "^3.0.0"
     react-lifecycles-compat "^3.0.2"
 
-mobx@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.1.0.tgz#ae772ca8eb0c1dd93341ffce375f44a80050014d"
-  integrity sha512-cQzBmF2gbpcBR2xKwt5jZx0ncDMC9Hg5nYrp3Krv0qHH4GFqWZyR+ZLkRJRcvVF4rqxpy2G96Qbk5YzyQ8tdXw==
+mobx@^5.5.2:
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.5.2.tgz#4f5d751b77807a88218caede92198679a0e18a4a"
+  integrity sha512-2/nZyxET6T2BvFDLYGSf5sMJ1N9wdV9zHtAkfkk+hzJL+kzQQ/vLdPS5UmwNNBqH1HF6FpIcZR+1BJ/jc3YrMQ==
 
 ms@2.0.0:
   version "2.0.0"
@@ -7607,6 +7614,11 @@ react-is@^16.3.1:
   version "16.4.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.4.2.tgz#84891b56c2b6d9efdee577cc83501dfc5ecead88"
   integrity sha512-rI3cGFj/obHbBz156PvErrS5xc6f1eWyTwyV4mo0vF2lGgXgS+mm7EKD5buLJq6jNgIagQescGSVG2YzgXt8Yg==
+
+react-is@^16.3.2:
+  version "16.6.0"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.6.0.tgz#456645144581a6e99f6816ae2bd24ee94bdd0c01"
+  integrity sha512-q8U7k0Fi7oxF1HvQgyBjPwDXeMplEsArnKt2iYhuIF86+GBbgLHdAmokL3XUFjTd7Q363OSNG55FOGUdONVn1g==
 
 react-lifecycles-compat@^3.0.2:
   version "3.0.4"

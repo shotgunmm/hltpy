@@ -30,24 +30,26 @@ ALLOWED_HOSTS = ['*'] if DEBUG else []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.auth',
+    #'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
     'django_extensions',
 
-    'hltpy.contacts'
+    'hltpy.contacts',
+    'hltpy.accounts'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'hltpy.auth.integrations.LaravelAuthMiddleware',
+    'hltpy.accounts.integrations.LaravelAuthMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+#    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -71,7 +73,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'hltpy.wsgi.application'
-AUTH_USER_MODEL = 'hltpy.auth.User'
+AUTH_USER_MODEL = 'accounts.User'
+LOGIN_URL = '/providers/sign-in'
 
 
 # Database
@@ -79,14 +82,13 @@ AUTH_USER_MODEL = 'hltpy.auth.User'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    },
-    'legacy': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'humanlif_hlt1',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'password',
+         'OPTIONS': {
+             "init_command": "SET foreign_key_checks = 0;",
+         },
     }
 }
 

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import AnonymousUser
 from django.http import HttpRequest
 
 from .models import Session, User
@@ -12,11 +13,19 @@ def LaravelAuthMiddleware(get_response):
             try:
                 session = Session.objects.get(id=cookie)
                 user_id = session.extract_user_id()
-                request.user = authenticate(request, laravel_user_id=user_id)
-            except Session.DidNotExist:
+                user = User.objects.get(id=user_id)
+                user.backend = 'hltpy.accounts.integrations.LaravelAuthBackend'
+                request.user = user
+                return get_response(request)
+            except User.DoesNotExist:
+                pass
+            except Session.DoesNotExist:
                 pass
 
+        request.user = AnonymousUser()
         return get_response(request)
+
+    return middleware
 
 
 class LaravelAuthBackend:

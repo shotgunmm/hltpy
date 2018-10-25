@@ -1,4 +1,5 @@
 import { Button, ButtonIcon } from "@rmwc/button";
+import { SimpleChip } from '@rmwc/chip';
 import { CircularProgress } from "@rmwc/circular-progress";
 import { Elevation } from "@rmwc/elevation";
 import { List, SimpleListItem } from "@rmwc/list";
@@ -116,13 +117,13 @@ export default class ContactEdit extends React.Component<Props, State> {
       );
     } else {
       return (
-        <Elevation key={label} className="contact-section" z={6}>
-          <h3 className="mdc-typography--subtitle2">
+        <Elevation key={label} className="contact-section contact-section-edit" z={6}>
+          <span className="mdc-typography--button">
             {label}
-            <Button onClick={this.saveSection}>
-              <ButtonIcon>save</ButtonIcon> Save
-            </Button>
-          </h3>
+          </span>
+          <Button onClick={this.saveSection}>
+            <ButtonIcon>save</ButtonIcon> Save
+          </Button>
           {saving ? <CircularProgress /> :
             <List>
               {fields.map(field => (
@@ -166,7 +167,9 @@ export default class ContactEdit extends React.Component<Props, State> {
 
     return (
       <Elevation className="contact-section" z={3} key="Notes">
-        <h3 className="mdc-typography--subtitle2">Notes</h3>
+        <span className="mdc-typography--button">
+          Notes
+        </span>
         <List>
           {!newNote && <SimpleListItem
             key="new"
@@ -212,6 +215,7 @@ export default class ContactEdit extends React.Component<Props, State> {
       <AppFrame>
         <div className="contact-header">
           <h1 className="mdc-typography--headline4">{this.getTitle()}</h1>
+          <SimpleChip leadingIcon="email" text="Email" />
         </div>
         <div className="contact-body">
           {isNew &&

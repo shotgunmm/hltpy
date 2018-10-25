@@ -45,6 +45,7 @@ class Contact(models.Model):
         return result
 
 
+
 class ContactEvent(models.Model):
     contact = models.ForeignKey(
         Contact, on_delete=models.CASCADE, related_name='event_set')
