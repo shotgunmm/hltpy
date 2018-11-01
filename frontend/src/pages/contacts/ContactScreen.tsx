@@ -22,7 +22,7 @@ export default class ContactScreen extends React.Component<{}, State> {
       );
   };
 
-  headerColumns = () => ["Name", "Phone Number", "Phone", "Address"];
+  headerColumns = () => ["Name", "Email", "Phone", "Address"];
 
   componentWillMount() {
     this.refresh();
@@ -54,8 +54,7 @@ export default class ContactScreen extends React.Component<{}, State> {
         {value.phone_mobile || value.phone_home || value.phone_work}
       </DataTableCell>
       <DataTableCell>
-        {value.address_street} <br />
-        {value.address_city}
+        {value.address_street && `${value.address_street}, ${value.address_city}`}
       </DataTableCell>
       <DataTableCell>
         <IconButton icon="edit" {...{tag: Link, to: `/contacts/${value.id}`}} />

@@ -1,6 +1,7 @@
 import { Button, ButtonIcon } from "@rmwc/button";
 import { SimpleChip } from '@rmwc/chip';
 import { CircularProgress } from "@rmwc/circular-progress";
+import { SimpleDialog } from '@rmwc/dialog';
 import { Elevation } from "@rmwc/elevation";
 import { List, SimpleListItem } from "@rmwc/list";
 import { TextField } from "@rmwc/textfield";
@@ -24,6 +25,7 @@ type State = {
   isNew: boolean
   newNote: string
   saving: boolean
+  deleteOpen: boolean
 };
 
 export default class ContactEdit extends React.Component<Props, State> {
@@ -45,7 +47,8 @@ export default class ContactEdit extends React.Component<Props, State> {
       expandedSection: null,
       isNew: false,
       changes: {},
-      newNote: ''
+      newNote: '',
+      deleteOpen: false
     });
     if (id) {
       this.loadItem(id);
@@ -63,8 +66,14 @@ export default class ContactEdit extends React.Component<Props, State> {
     }
   };
 
-  setSection = (section: string | null) => () =>
-    this.setState({ expandedSection: section });
+  setSection = (section: string | null) => () => {
+    if (Object.keys(this.state.changes).length === 0) {
+      this.setState({ expandedSection: section });
+    } else {
+      this.saveSection(section)
+    }
+  }
+  
 
   onSetValue = (key: string) => {
     return (event: any) => {
@@ -76,12 +85,12 @@ export default class ContactEdit extends React.Component<Props, State> {
   };
 
 
-  saveSection = () => {
+  saveSection = (nextSection: string | null = null) => {
     const { value, changes } = this.state
     const url = value.id ? `/contacts/${value.id}` : '/contacts'
 
     api.post(url, changes)
-      .then(response => this.setState({value: response.data.item, changes: [], expandedSection: null}))
+      .then(response => this.setState({value: response.data.item, changes: [], expandedSection: nextSection}))
   }
 
   renderSection = (label: string, icon: string, fields: FieldDescription[]) => {
@@ -93,7 +102,7 @@ export default class ContactEdit extends React.Component<Props, State> {
         <Elevation
           key={label}
           className="contact-section"
-          z={3}
+          z={1}
           onClick={this.setSection(label)}
         >
           <List>
@@ -116,28 +125,37 @@ export default class ContactEdit extends React.Component<Props, State> {
         </Elevation>
       );
     } else {
+
+      let lastValueSet = true;
+
       return (
         <Elevation key={label} className="contact-section contact-section-edit" z={6}>
           <span className="mdc-typography--button">
             {label}
           </span>
-          <Button onClick={this.saveSection}>
+          <Button onClick={() => this.saveSection()}>
             <ButtonIcon>save</ButtonIcon> Save
           </Button>
           {saving ? <CircularProgress /> :
             <List>
-              {fields.map(field => (
-                <div key={field.key}>
-                  <TextField
-                    style={{ width: "50%" }}
-                    withLeadingIcon={icon}
-                    key={field.key}
-                    label={field.label}
-                    value={value[field.key] || ""}
-                    onChange={this.onSetValue(field.key)}
-                  />
-                </div>
-              ))}
+              {fields.map(field => {
+                if (!lastValueSet) {
+                  return []
+                } else {
+                  lastValueSet = !!value[field.key]
+
+                  return <div key={field.key}>
+                    <TextField
+                      style={{ width: "50%" }}
+                      withLeadingIcon={icon}
+                      key={field.key}
+                      label={field.label}
+                      value={value[field.key] || ""}
+                      onChange={this.onSetValue(field.key)}
+                    />
+                  </div>
+                }
+              })}
             </List>
           }
         </Elevation>
@@ -200,8 +218,46 @@ export default class ContactEdit extends React.Component<Props, State> {
     );
   };
 
+  showDelete = () => {
+    this.setState({ deleteOpen: true })
+  }
+
+  submitDelete = (evt: any) => {
+    const { value } = this.state
+    const { history } = this.props
+
+    if (evt.detail.action === 'accept') {
+      // delete the user
+      api.delete(`/contacts/${value.id}`)
+        .then(() => {
+          history.push('/contacts')
+      })
+    } else {
+      this.setState({deleteOpen: false})
+
+    }
+  }
+
+  renderDelete = () => {
+    const { value, deleteOpen } = this.state
+    if (value.id) {
+      return [
+        <Button key="btn" onClick={this.showDelete} theme="error">
+          <ButtonIcon icon="delete" /> Delete
+        </Button>,
+        <SimpleDialog key="dialog"
+          body="Are you sure you want to delete this contact?"
+          open={deleteOpen}
+          onClose={this.submitDelete}
+        />
+      ]
+    } else {
+      return []
+    }
+  }
+
   render() {
-    const { loading, isNew } = this.state;
+    const { loading } = this.state;
 
     if (loading) {
       return (
@@ -218,10 +274,11 @@ export default class ContactEdit extends React.Component<Props, State> {
           <SimpleChip leadingIcon="email" text="Email" />
         </div>
         <div className="contact-body">
-          {isNew &&
-            this.renderSection("Name", "person", [
+            {this.renderSection("Person", "person", [
               { key: "first_name", label: "First Name" },
-              { key: "last_name", label: "Last Name" }
+              { key: "last_name", label: "Last Name" },
+              { key: "company", label: "Company" },
+              { key: "buyer_name", label: "On Behalf Of" },
             ])}
 
           {this.renderSection("Email", "email", [
@@ -236,9 +293,15 @@ export default class ContactEdit extends React.Component<Props, State> {
           {this.renderSection("Home Address", "location_on", [
             { key: "address_street", label: "Street Address" },
             { key: "address_city", label: "City" },
-            { key: "address_state", label: "State" }
+            { key: "address_state", label: "State" },
+            { key: "address_zip", label: "Zip" }
+          ])}
+          {this.renderSection("Mortgage", "attach_money", [
+            { key: "mortgage_broker", label: "Mortgage Broker" },
+            { key: "mortgage_company", label: "Mortgage Company" },
           ])}
           {this.renderNotesSection()}
+          {this.renderDelete()}
         </div>
       </AppFrame>
     );

@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django_extensions',
 
     'hltpy.contacts',
-    'hltpy.accounts'
+    'hltpy.accounts',
+    'hltpy.openhouses'
 ]
 
 MIDDLEWARE = [

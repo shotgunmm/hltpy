@@ -9,6 +9,7 @@
     "variable-name": [true, "allow-snake-case", "allow-pascal-case"],
     "interface-name": [false],
     "jsx-boolean-value": [false],
+    "jsx-no-lambda": [false],
     "no-console": [false],
     "interface-over-type-literal": [false],
     "object-literal-shorthand": false,

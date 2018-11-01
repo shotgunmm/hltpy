@@ -26,21 +26,44 @@ class Contact(models.Model):
     address_state = models.CharField(max_length=2, blank=True, null=True)
     address_zip = models.CharField(max_length=5, blank=True, null=True)
 
-    workplace = models.CharField(max_length=255, blank=True, null=True)
+    open_house_visit = models.ForeignKey('openhouses.OpenHouse', blank=True, null=True, on_delete=models.SET_NULL)
+    agent_name = models.CharField(max_length=512, blank=True, null=True)
+    agent_company = models.CharField(max_length=128, blank=True, null=True)
+    agent_phone = models.CharField(max_length=100, blank=True, null=True)
+    agent_email = models.CharField(max_length=512, blank=True, null=True)
+
+    mortgage_qualified = models.BooleanField(default=False)
+    mortgage_broker = models.CharField(max_length=512, blank=True, null=True)
+    mortgage_company = models.CharField(max_length=128, blank=True, null=True)
+
+    buyer_name = models.CharField(max_length=512, blank=True, null=True)
+
+    company = models.CharField(max_length=255, blank=True, null=True)
     position = models.CharField(max_length=255, blank=True, null=True)
+
+    deleted = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def as_json(self, events=False):
-        result = extract(self, 'id', 'first_name', 'last_name', 'state',
+    EDITABLE_FIELDS = ['first_name', 'last_name', 'state',
                          'phone_mobile', 'phone_home', 'phone_work',
                          'phone_times', 'email_personal', 'email_work',
                          'address_street', 'address_city', 'address_state', 'address_zip',
-                         'workplace', 'position', 'created', 'updated')
+                         'agent_name', 'agent_company', 'agent_phone', 'agent_email',
+                         'mortgage_qualified', 'mortgage_broker', 'mortgage_company',
+                         'buyer_name', 'company', 'position']
+    READONLY_FIELDS = ['id', 'created', 'updated']
+    
+    def as_json(self, events=False):
+        fields = self.EDITABLE_FIELDS + self.READONLY_FIELDS
+        result = extract(self, *fields)
 
         if events:
             result['events'] = [_.as_json() for _ in self.event_set.all().order_by('-created')]
+
+        if self.open_house_visit_id != None:
+            result['open_house'] = self.open_house_visit.as_json()
 
         return result
 
