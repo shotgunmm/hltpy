@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from ..utils import extract
+from ..openhouses.models import OpenHouse
 
 
 class Contact(models.Model):
@@ -62,8 +63,11 @@ class Contact(models.Model):
         if events:
             result['events'] = [_.as_json() for _ in self.event_set.all().order_by('-created')]
 
-        if self.open_house_visit_id != None:
-            result['open_house'] = self.open_house_visit.as_json()
+        if events and self.open_house_visit_id != None:
+            try: 
+                result['open_house'] = self.open_house_visit.as_json()
+            except OpenHouse.DoesNotExist:
+                pass
 
         return result
 
@@ -90,3 +94,12 @@ class ContactEvent(models.Model):
 
     def as_json(self):
         return extract(self, 'id', 'kind', 'field_changed', 'value_before', 'value_after', 'note', 'created')
+
+
+class ContactStar(models.Model):
+    contact = models.ForeignKey(
+        Contact, on_delete=models.CASCADE, related_name='star_set')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
+    created = models.DateTimeField(auto_now_add=True)

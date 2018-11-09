@@ -29,6 +29,7 @@ export default class AppFrame extends React.Component<Props, {}> {
             <DrawerContent>
               <List className="sidebar">
                 <SimpleListItem graphic="contacts" text="Contacts" {...{ tag: Link, to: '/contacts' }}/>
+                <SimpleListItem graphic="home" text="Open Houses" {...{ tag: Link, to: '/openhouses' }}/>
                 <SimpleListItem graphic="group" text="Meetups" {...{ tag: Link, to: '/contacts' }}/>
                 <SimpleListItem graphic="mail" text="Messages" {...{ tag: Link, to: '/contacts' }}/>
                 <SimpleListItem graphic="account_circle" text="Profile" {...{ tag: Link, to: '/contacts' }}/>

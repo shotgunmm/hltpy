@@ -67,6 +67,7 @@ class User(models.Model):
         db_table = 'users'
 
 
+
 class Session(models.Model):
     id = models.CharField(unique=True, max_length=255, primary_key=True)
     payload = models.TextField()

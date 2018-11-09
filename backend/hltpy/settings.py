@@ -41,7 +41,8 @@ INSTALLED_APPS = [
 
     'hltpy.contacts',
     'hltpy.accounts',
-    'hltpy.openhouses'
+    'hltpy.openhouses',
+    'hltpy.associates',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'hltpy.accounts.integrations.LaravelAuthMiddleware',
+    'hltpy.utils.JsonBodyMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',
 #    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

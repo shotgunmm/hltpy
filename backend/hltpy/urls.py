@@ -14,15 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from .contacts import views as contacts
 from .openhouses import views as openhouses
 
 urlpatterns = [
     path('dashboard', contacts.index),
-    path('dashboard/openhouse/submit', openhouses.contactform_submit),
     path('dashboard/<path:path>', contacts.index),
+    path('openhouse/', include('hltpy.openhouses.urls')),
     path('api/contacts', contacts.all_contacts),
+    path('api/contacts/stars', contacts.get_contact),
     path('api/contacts/<int:contact_id>', contacts.get_contact),
+    path('api/contacts/<int:contact_id>/star', contacts.set_star),
+    path('api/openhouses', openhouses.all_records),
+    path('api/openhouses/<int:record_id>', openhouses.get_record),
 ]

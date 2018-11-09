@@ -1,43 +1,194 @@
 import { Button, ButtonIcon } from "@rmwc/button";
-import { SimpleChip } from '@rmwc/chip';
 import { CircularProgress } from "@rmwc/circular-progress";
-import { SimpleDialog } from '@rmwc/dialog';
 import { Elevation } from "@rmwc/elevation";
-import { List, SimpleListItem } from "@rmwc/list";
+import { List } from "@rmwc/list";
 import { TextField } from "@rmwc/textfield";
+import { DateTime } from 'luxon';
+import { DatePicker, TimePicker } from 'material-ui-pickers';
 import * as React from "react";
 import { RouteComponentProps } from "react-router";
 import AppFrame from "src/components/AppFrame";
 import api from "src/store/api";
 
-type FieldDescription = {
-  key: string;
-  label: string;
-};
 
+type FieldDesc = {
+  key: string,
+  label: string,
+  type?: string,
+  options?: any
+}
 type Props = RouteComponentProps<{ id: string }>;
 
 type State = {
-  value: Contact
+  value: OpenHouse;
   changes: {}
-  loading: boolean
-  expandedSection: string | null
   isNew: boolean
-  newNote: string
-  saving: boolean
-  deleteOpen: boolean
+  loading: boolean
 };
 
-export default class ContactEdit extends React.Component<Props, State> {
+export default class OpenHouseEdit extends React.Component<Props, State> {
   loadItem = (id: string) => {
     this.setState({ loading: true });
-    api.get(`/contacts/${id}`).then(response =>
+    api.get(`/openhouses/${id}`).then(response =>
       this.setState({
         value: response.data.item,
         loading: false
       })
     );
   };
+
+  componentWillMount() {
+    const { id } = this.props.match.params;
+    this.setState({
+      value: {} as OpenHouse,
+      loading: true,
+      isNew: false,
+      changes: {},
+    });
+    if (id) {
+      this.loadItem(id);
+    } else {
+      this.setState({ isNew: true, loading: false });
+    }
+  }
+
+  onSetValue = (field: string) => (e: any) => {
+    if (e.target) {
+      e = e.target
+    }
+    if (e.value !== undefined) {
+      e = e.value
+    }
+
+    const { value, changes } = this.state
+
+    let changeValue = e
+    console.log(e)
+
+    if (field === "start_time" || field === "end_time") {
+      changeValue = e.toFormat("HH:mm:ss")
+    } else if (field === "date") {
+      changeValue = e.toISODate("YYYY-M-d")
+    }
+    this.setState({value: { ...value, [field]: e }, changes: { ...changes, [field]: changeValue}})
+  }
+
+  save = () => {
+    const { value, changes } = this.state
+    const { history } = this.props
+    const url = value.id ? `/openhouses/${value.id}`: `/openhouses`
+    api.post(url, changes)
+      .then(response => {
+        if (response.data.success) {
+          this.setState({ value: response.data.item, changes: [] })
+          history.push('/openhouses')
+        } else {
+          alert(response.data.errors)
+        }
+      })
+  }
+
+  renderSection = (title: string, fields: FieldDesc[]) => {
+    const { value } = this.state
+
+    return <Elevation key={title} className="contact-section"
+      z={1}
+    >
+      <span className="mdc-typography--button">{title}</span>
+      <List>
+      {fields.map((field: FieldDesc) => {
+        const type = field.type || "text"
+        const options = field.options || {}
+        let result = <div />;
+
+        if (type === "text" || type === "number") {
+          result = <TextField
+            style={{ width: "50%" }}
+            key={field.key}
+            type={type}
+            label={field.label}
+            value={value[field.key] || ""}
+            onChange={this.onSetValue(field.key)}
+            {...options}
+          />
+        } else if (type === "date") {
+          result = <DatePicker
+            key={field.key}
+            label={field.label}
+            value={value[field.key] || null}
+            onChange={this.onSetValue(field.key)}
+            {...options}
+          />
+        } else if (type === "time") {
+          const fieldValue = DateTime.fromISO(value[field.key]) || undefined
+          result = <TimePicker
+            key={field.key}
+            label={field.label}
+            value={fieldValue}
+            onChange={this.onSetValue(field.key)}
+            {...options}
+          />
+        } else if (type === "file") {
+          result = <TextField
+            key={field.key}
+            label={field.label}
+            type="file"
+            onChange={this.onSetValue(field.key)}
+            {...options}
+          />
+        } 
+        return <div key={field.key}>{result}</div>
+      })}
+      </List>
+    </Elevation>
+  }
+
+  getTitle = () => {
+    const { value } = this.state
+    return value.name || "New Open House"
+  }
+  render() {
+    const { loading } = this.state;
+
+    if (loading) {
+      return (
+        <AppFrame>
+          <CircularProgress />
+        </AppFrame>
+      )
+    } 
+
+    return <AppFrame>
+      <div className="contact-header">
+        <h1 className="mdc-typography--headline4">{this.getTitle()}</h1>
+      </div>
+      <div className="contact-body">
+        <Button raised onClick={() => this.save()}>
+          <ButtonIcon>save</ButtonIcon> Save
+        </Button>
+        {this.renderSection("Description", [
+          { key: 'name', label: 'Name' },
+          { key: 'address', label: 'Address' },
+          { key: 'list_price', label: 'List Price', type: 'number', options: {withLeadingIcon: "attach_money"} },
+          { key: 'mls_id', label: 'MLS #' },
+        ])}
+        {this.renderSection("When", [
+          { key: 'date', label: 'Date', type: 'date' },
+          { key: 'start_time', label: 'Start Time', type: 'time' },
+          { key: 'end_time', label: 'End Time', type: 'time' },
+        ])}
+        {this.renderSection("Attachments", [
+          { key: 'image', label: '', type: 'file' }
+          ])}
+        <Button raised onClick={() => this.save()}>
+          <ButtonIcon>save</ButtonIcon> Save
+        </Button>
+      </div>
+      </AppFrame>
+  }
+}
+
+/*
   componentWillMount() {
     const { id } = this.props.match.params;
     this.setState({
@@ -221,6 +372,7 @@ export default class ContactEdit extends React.Component<Props, State> {
   showDelete = () => {
     this.setState({ deleteOpen: true })
   }
+
   submitDelete = (evt: any) => {
     const { value } = this.state
     const { history } = this.props
@@ -233,6 +385,7 @@ export default class ContactEdit extends React.Component<Props, State> {
       })
     } else {
       this.setState({deleteOpen: false})
+
     }
   }
 
@@ -305,3 +458,4 @@ export default class ContactEdit extends React.Component<Props, State> {
     );
   }
 }
+*/

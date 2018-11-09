@@ -1,0 +1,48 @@
+{% extends "openhouses/base.html" %}
+
+{% block body %}
+<div class="main-con">
+    <div class="dark-blue">
+    </div>
+    <form>
+        <div class="blue">
+            <div class="heading">
+                <h2>HAVE A GREAT OPEN HOUSE TODAY!</h2>
+                <h3>You're about to launch the Open House registration form.</h3>
+
+                <p class="kiosk-mode">Click <b>View &gt; Enter Full Screen</b> to expand this window.</p>
+            </div>
+        </div>
+    </form>
+
+</div>
+<div class="today-hosts-main2">
+    <div class="container">
+        <div class="today-hosts">
+
+            <div class="get_started">
+                <p>Let's Get Started!</p>
+                <div class="btn_get_started"><a href="{{ open_house.kiosk_url }}" target="_self">LAUNCH</a></div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+<div class="footer-logo">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-sm-12">
+                <div style="text-align:center; margin:20px 0 20px 0">
+                <a href="#"><img src="/openhouses/image/logo.png" alt="logo"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="blue-bar">
+
+</div>
+{% endblock %}

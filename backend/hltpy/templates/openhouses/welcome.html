@@ -1,0 +1,91 @@
+{% extends "openhouses/base.html" %}
+{% block body %}
+<section class="top-bar">
+    <div class="container">
+        <div class="row">
+            <div class="head-top">
+                <h1>The Seller Requests Signing in Before Viewing</h1>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="broker">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="head-broker">
+                    <h1>Are You a Buyer or Broker?</h1>
+                    <div class="broker-button">
+                        <ul class="first">
+                            <li><a href="{{ open_house.kiosk_url }}/buyer">Iʼm a <strong>Buyer</strong> or <strong>Visitor</strong>
+                            <span><i class="fa fa-arrow-right" aria-hidden="true"></i></span></a></li>
+                            <li><a href="{{ open_house.kiosk_url }}/broker" target="_blank">Iʼm a <strong>Broker</strong> or <strong>Agent</strong>
+                            <span><i class="fa fa-arrow-right" aria-hidden="true"></i></span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="para">
+                    <p>All agents or brokers of Better Living Real Estate represent the seller of this property unless otherwise disclosed. For additional agency disclosure, please request a personal meeting with the hosting agent for receipt of a signed state approved agency disclosure form.</p>
+                </div>
+            </div>
+            <div class="today-host">
+            <div class="col-sm-6 col-xs-12">
+                <div class="home-image">
+                      <img src="http://media.mlspin.com/photo.aspx?mls={{ open_house.mls_id }}&w=340&h=256&n="
+                                                  alt="street">
+                    <div class="info">
+                    <p>{{ open_house.address }}</p>
+                </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xs-12">
+                <div class="host">
+                    <h1>Todayʼs Hosts:</h1>
+
+                    <div class="host-image">
+                        <img class="img-responsive" src="{{ user.associate.headshot }}" alt="">
+                        <p>{{ user.get_full_name }}<br>
+                          Real Estate Agent</p>
+                    </div>
+
+                    <!--
+                    {% comment %}
+                    @foreach( $openhouse->agentsList() as $agent )
+
+                        <div class="host-image">
+                            <img class="img-responsive" src="{{$agent['headshot']}}" alt="">
+                            <p>{{$agent['first_name']}} {{$agent['last_name']}}<br>
+                              {{$agent['services']['title']}}</p>
+                        </div>
+                    @endforeach
+                    @foreach( $openhouse->membersList() as $agent )
+                          <div class="host-image">
+                            <img class="img-responsive" src="{{$agent['headshot']}}" alt="">
+                            <p>{{$agent['first_name']}} {{$agent['last_name']}}<br>
+                              {{$agent['services']['title']}}</p>
+                        </div>
+                    @endforeach
+                    {% endcomment %}
+                    -->
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+<footer>
+    <section class="logo">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <div class="logo-image">
+                        <img src="/openhouses2/images/better-living.jpg" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</footer>
+
+{% endblock %}

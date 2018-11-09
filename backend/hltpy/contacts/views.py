@@ -39,20 +39,34 @@ def all_contacts(request):
 def get_contact(request, contact_id=None):
     if 'GET' == request.method:
         contact = get_object_or_404(Contact, id=contact_id)
-    if request.method in ['GET', 'DELETE']:
+    if request.method in ['POST', 'DELETE']:
         contact = get_object_or_404(Contact, id=contact_id) if contact_id else Contact(owner=request.user)
 
         if 'POST' == request.method:
-            data = json.loads(request.body.decode('utf-8'))
-            for field, value in data.items():
+            for field, value in request.data.items():
                 if field in ALLOWED_FIELDS:
                     setattr(contact, field, str(value))
-            if 'note' in data:
+            if 'note' in request.data:
                 contact.event_set.create(owner=request.user, kind='note', note=data['note'])
         elif 'DELETE' == request.method:
             contact.deleted = True
         
         contact.save()
 
-
     return render_json({'item': contact.as_json(events=True)})
+
+@login_required
+def get_stars(request):
+    stars = ContactStar.objects.filter(user=request.user).values_list('contact_id', flat=True)
+    return render_json({'starred': stars})
+
+@login_required
+def set_star(request, contact_id):
+    contact = get_object_or_404(Contact, id=contact_id)
+    if 'POST' == request.method:
+        ContactStar.objects.get_or_create(contact=contact, user=request.user)
+        return render_json({'success': True})
+
+    elif 'DELETE' == request.method:
+        ContactStar.objects.filter(contact=contact, user=request.user).delete()
+        return render_json({'success': True})
