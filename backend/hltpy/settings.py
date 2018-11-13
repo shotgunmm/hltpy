@@ -138,3 +138,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LARAVEL_SESSION_COOKIE = 'laravel_session'
+
+try:
+    from .local_settings import *
+except ImportError:
+    raise Exception("local_settings.py not found")

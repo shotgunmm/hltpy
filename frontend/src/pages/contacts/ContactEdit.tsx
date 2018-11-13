@@ -13,6 +13,7 @@ import api from "src/store/api";
 type FieldDescription = {
   key: string;
   label: string;
+  width?: number;
 };
 
 type Props = RouteComponentProps<{ id: string }>;
@@ -95,9 +96,9 @@ export default class ContactEdit extends React.Component<Props, State> {
 
   renderSection = (label: string, icon: string, fields: FieldDescription[]) => {
     const { expandedSection, value, saving } = this.state;
+
     if (expandedSection !== label) {
       const setFields = fields.filter(field => value[field.key]);
-
       return (
         <Elevation
           key={label}
@@ -106,14 +107,16 @@ export default class ContactEdit extends React.Component<Props, State> {
           onClick={this.setSection(label)}
         >
           <List>
-            {setFields.map(field => (
-              <SimpleListItem
+            {setFields.map(field => {
+              return <SimpleListItem
+                // style={{width: field.width || "100%"}}
+                className={field.width ? "field narrow" : "field wide"}
                 key={field.key}
                 graphic={icon}
                 text={value[field.key]}
                 secondaryText={field.label}
               />
-            ))}
+            })}
             {setFields.length === 0 && (
               <SimpleListItem
                 key={label}
@@ -143,10 +146,14 @@ export default class ContactEdit extends React.Component<Props, State> {
                   return []
                 } else {
                   lastValueSet = !!value[field.key]
+                  // const thisIcon = lastIcon === icon ? undefined : icon;
 
-                  return <div key={field.key}>
+                  return <div key={field.key}
+                    className={field.width ? "field narrow" : "field wide"}
+                    style={{width: field.width ? `${field.width * 0.8}%` : "80%"}}
+                  >
                     <TextField
-                      style={{ width: "50%" }}
+                      style={{width: "100%"}}
                       withLeadingIcon={icon}
                       key={field.key}
                       label={field.label}
@@ -273,10 +280,10 @@ export default class ContactEdit extends React.Component<Props, State> {
         </div>
         <div className="contact-body">
             {this.renderSection("Person", "person", [
-              { key: "first_name", label: "First Name" },
-              { key: "last_name", label: "Last Name" },
-              { key: "company", label: "Company" },
-              { key: "buyer_name", label: "On Behalf Of" },
+              { key: "first_name", label: "First Name", width: 50 },
+              { key: "last_name", label: "Last Name", width: 50 },
+              { key: "company", label: "Company", width: 50 },
+              { key: "buyer_name", label: "On Behalf Of", width: 50 },
             ])}
 
           {this.renderSection("Email", "email", [
@@ -284,19 +291,19 @@ export default class ContactEdit extends React.Component<Props, State> {
             { key: "email_work", label: "Work" }
           ])}
           {this.renderSection("Phone", "phone", [
-            { key: "phone_mobile", label: "Mobile" },
-            { key: "phone_home", label: "Home" },
+            { key: "phone_mobile", label: "Mobile", width: 50 },
+            { key: "phone_home", label: "Home", width: 50 },
             { key: "phone_times", label: "Best time to call" }
           ])}
           {this.renderSection("Home Address", "location_on", [
             { key: "address_street", label: "Street Address" },
-            { key: "address_city", label: "City" },
-            { key: "address_state", label: "State" },
-            { key: "address_zip", label: "Zip" }
+            { key: "address_city", label: "City", width: 50, },
+            { key: "address_state", label: "State", width: 20, },
+            { key: "address_zip", label: "Zip", width: 30 }
           ])}
           {this.renderSection("Mortgage", "attach_money", [
-            { key: "mortgage_broker", label: "Mortgage Broker" },
-            { key: "mortgage_company", label: "Mortgage Company" },
+            { key: "mortgage_broker", label: "Mortgage Broker", width: 50 },
+            { key: "mortgage_company", label: "Mortgage Company", width: 50 },
           ])}
           {this.renderNotesSection()}
           {this.renderDelete()}

@@ -73,6 +73,7 @@ $primary: #1976d2;
   padding: 0.5rem 0.5rem 1rem 0.5rem;
   background: white;
   margin-bottom: 1rem;
+  overflow: auto;
 
   .mdc-list-item {
     height: auto;
@@ -84,6 +85,12 @@ $primary: #1976d2;
 }
 
 .contact-section-edit {
+  .field.narrow {
+    float: left;
+  }
+  .mdc-text-field {
+    background: white;
+  }
   .mdc-text-field__input{
     padding-left: 68px;
   }
@@ -93,4 +100,16 @@ $primary: #1976d2;
  .mdc-floating-label--float-above {
    padding-left: 26px;
  }
+}
+
+.favorite {
+  color: orange;
+  cursor: pointer;
+}
+
+.search-field {
+  margin: 4px 12px !important;
+  input {
+    padding-top: 6px !important;
+  }
 }

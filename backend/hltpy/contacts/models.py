@@ -1,8 +1,26 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 
 from ..utils import extract
 from ..openhouses.models import OpenHouse
+
+
+class ContactManager(models.Manager):
+    def match_query(self, query):
+        qs = self.get_queryset()
+        q_chain = None
+
+        for field in Contact.SEARCH_FIELDS:
+            field_name = field + '__icontains'
+            filter = {field_name: query}
+
+            if q_chain:
+                q_chain = q_chain | Q(**filter)
+            else:
+                q_chain = Q(**filter)
+        
+        return qs.filter(q_chain)
 
 
 class Contact(models.Model):
@@ -47,6 +65,8 @@ class Contact(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    objects = ContactManager()
+
     EDITABLE_FIELDS = ['first_name', 'last_name', 'state',
                          'phone_mobile', 'phone_home', 'phone_work',
                          'phone_times', 'email_personal', 'email_work',
@@ -55,7 +75,11 @@ class Contact(models.Model):
                          'mortgage_qualified', 'mortgage_broker', 'mortgage_company',
                          'buyer_name', 'company', 'position']
     READONLY_FIELDS = ['id', 'created', 'updated']
-    
+
+    SEARCH_FIELDS = ['first_name', 'last_name', 'state', 'phone_mobile', 'phone_home', 'email_personal',
+        'email_work', 'address_street', 'address_city', 'address_state', 'agent_name', 'agent_company', 'agent_phone',
+        'agent_email', 'mortgage_broker', 'mortgage_company', 'company']
+
     def as_json(self, events=False):
         fields = self.EDITABLE_FIELDS + self.READONLY_FIELDS
         result = extract(self, *fields)

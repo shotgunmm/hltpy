@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -7,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import urlencode
 
 from ..utils import render_json
-from .models import Contact
+from .models import Contact, ContactStar
 
 ALLOWED_FIELDS = ['first_name', 'last_name', 'state',
     'phone_mobile', 'phone_home', 'phone_work',
@@ -32,7 +33,27 @@ def all_contacts(request):
     if 'POST' == request.method:
         return get_contact(request)
 
-    return render_json({'items': [_.as_json() for _ in Contact.objects.filter(deleted=False)]})
+    if request.GET.get('q'):
+        contacts = Contact.objects.match_query(request.GET['q'])
+    else:
+        contacts = Contact.objects.all()
+
+    contacts = contacts.filter(deleted=False).order_by('last_name')
+
+    query = request.POST.get('q')
+    if query:
+        contacts = contacts.filter(~Q(first_name__like='%' + query + '%') | ~Q(last_name__like='%' + query + '%'))
+
+    contacts = [_.as_json() for _ in contacts]
+
+    stars = ContactStar.objects.filter(user=request.user).values_list('contact_id', flat=True)
+
+    for contact in contacts:
+        contact["starred"] = contact["id"] in stars
+
+    contacts.sort(key=lambda c: (not c["starred"], c["last_name"]))
+
+    return render_json({'items': contacts, 'stars': stars})
 
 
 @login_required
@@ -57,7 +78,6 @@ def get_contact(request, contact_id=None):
 
 @login_required
 def get_stars(request):
-    stars = ContactStar.objects.filter(user=request.user).values_list('contact_id', flat=True)
     return render_json({'starred': stars})
 
 @login_required
@@ -65,8 +85,10 @@ def set_star(request, contact_id):
     contact = get_object_or_404(Contact, id=contact_id)
     if 'POST' == request.method:
         ContactStar.objects.get_or_create(contact=contact, user=request.user)
-        return render_json({'success': True})
+        stars = ContactStar.objects.filter(user=request.user).values_list('contact_id', flat=True)
+        return render_json({'success': True, 'stars': stars})
 
     elif 'DELETE' == request.method:
         ContactStar.objects.filter(contact=contact, user=request.user).delete()
-        return render_json({'success': True})
+        stars = ContactStar.objects.filter(user=request.user).values_list('contact_id', flat=True)
+        return render_json({'success': True, 'stars': stars})
