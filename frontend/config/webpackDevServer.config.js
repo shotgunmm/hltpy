@@ -84,7 +84,7 @@ module.exports = function(proxy, allowedHost) {
     
     proxy: {
       "/": {
-        target: "http://localhost:8000",
+        target: "http://localhost:8090",
         bypass(req) {
           return req.path.startsWith('/static');
         }

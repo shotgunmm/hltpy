@@ -1,3 +1,4 @@
+import Button, { ButtonIcon } from "@rmwc/button";
 import { CircularProgress } from "@rmwc/circular-progress";
 import { DataTable, DataTableBody, DataTableCell, DataTableContent, DataTableHead, DataTableHeadCell, DataTableRow } from "@rmwc/data-table";
 import { Fab } from '@rmwc/fab';
@@ -89,7 +90,7 @@ export default class ContactScreen extends React.Component<{}, State> {
     const { loading } = this.state;
     return (
       <AppFrame onQuery={this.setQuery}>
-        <DataTable style={{ width: "100%" }}>
+        <DataTable>
           <DataTableContent>
             {this.renderHeader()}
             <DataTableBody>
@@ -98,6 +99,9 @@ export default class ContactScreen extends React.Component<{}, State> {
           </DataTableContent>
           {loading && <CircularProgress />}
         </DataTable>
+        <Button {...{tag: Link, to: '/contacts/import'}}>
+          <ButtonIcon>import_export</ButtonIcon> Import from Gmail
+        </Button>
         <Fab icon="add" className="corner-fab" {...{ tag: Link, to: "/contacts/new" }}/>
       </AppFrame>
     );

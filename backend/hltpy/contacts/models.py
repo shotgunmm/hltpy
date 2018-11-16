@@ -2,8 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
-from ..utils import extract
 from ..openhouses.models import OpenHouse
+from ..utils import extract
 
 
 class ContactManager(models.Manager):
@@ -59,6 +59,8 @@ class Contact(models.Model):
 
     company = models.CharField(max_length=255, blank=True, null=True)
     position = models.CharField(max_length=255, blank=True, null=True)
+
+    import_id = models.CharField(max_length=256, blank=True, null=True)
 
     deleted = models.BooleanField(default=False)
 

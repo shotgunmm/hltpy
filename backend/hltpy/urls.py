@@ -14,17 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
+from .contacts import import_views as contacts_import
 from .contacts import views as contacts
 from .openhouses import views as openhouses
 
 urlpatterns = [
     path('dashboard', contacts.index),
+    path('dashboard/contacts/import/auth', contacts_import.import_login),
     path('dashboard/<path:path>', contacts.index),
     path('openhouse/', include('hltpy.openhouses.urls')),
     path('api/contacts', contacts.all_contacts),
-    path('api/contacts/stars', contacts.get_contact),
+    path('api/contacts/import', contacts_import.import_contacts),
     path('api/contacts/<int:contact_id>', contacts.get_contact),
     path('api/contacts/<int:contact_id>/star', contacts.set_star),
     path('api/openhouses', openhouses.all_records),

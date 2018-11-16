@@ -1,9 +1,9 @@
 import json
 
-from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import urlencode
 
@@ -60,22 +60,36 @@ def all_contacts(request):
 def get_contact(request, contact_id=None):
     if 'GET' == request.method:
         contact = get_object_or_404(Contact, id=contact_id)
-    if request.method in ['POST', 'DELETE']:
-        contact = get_object_or_404(Contact, id=contact_id) if contact_id else Contact(owner=request.user)
+        return render_json({'item': contact.as_json(events=True)})
 
-        if 'POST' == request.method:
-            for field, value in request.data.items():
+    elif 'POST' == request.method:
+        contacts = []
+
+        for data in request.data: # JSON submission is an array of contacts
+            if data.get("import_id"):
+                contact, _ = Contact.objects.get_or_create(import_id=data["import_id"])
+            elif contact_id:
+                contact = get_object_or_404(Contact, id=contact_id) 
+            else:
+                contact = Contact(owner=request.user)
+
+            for field, value in data.items():
                 if field in ALLOWED_FIELDS:
                     setattr(contact, field, str(value))
-            if 'note' in request.data:
+            if 'note' in data:
                 contact.event_set.create(owner=request.user, kind='note', note=data['note'])
-        elif 'DELETE' == request.method:
-            contact.deleted = True
-        
+            contact.save()
+            contacts.append(contact)
+
+        return render_json({'items': [contact.as_json(events=True) for contact in contacts]})
+
+    elif 'DELETE' == request.method:
+        contact = get_object_or_404(Contact, id=contact_id) 
+        contact.deleted = True
         contact.save()
 
-    return render_json({'item': contact.as_json(events=True)})
-
+        return render_json({'success': True})
+    
 @login_required
 def get_stars(request):
     return render_json({'starred': stars})

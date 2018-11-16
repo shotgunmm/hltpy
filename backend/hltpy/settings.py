@@ -24,16 +24,17 @@ SECRET_KEY = '6@4a!f@air@z6g!+7wnfhe2-vf%-(8d9%d&(9j984@y)mlasi&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*'] if DEBUG else []
+ALLOWED_HOSTS = ['hlt.zvuk.net']
 
-
+if DEBUG:
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 # Application definition
 
 INSTALLED_APPS = [
     # 'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.auth',
-    #'django.contrib.sessions',
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
@@ -79,6 +80,8 @@ WSGI_APPLICATION = 'hltpy.wsgi.application'
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_URL = '/providers/sign-in'
 
+
+CANONICAL_DOMAIN = 'hlt.zvuk.net'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases

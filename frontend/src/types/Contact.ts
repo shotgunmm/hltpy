@@ -17,6 +17,7 @@ type Contact = {
   position: string
   created: string
   updated: string
+  open_house: OpenHouse
   events: ContactEvent[] | null
 }
 

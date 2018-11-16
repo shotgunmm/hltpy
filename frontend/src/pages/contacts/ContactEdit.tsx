@@ -90,8 +90,8 @@ export default class ContactEdit extends React.Component<Props, State> {
     const { value, changes } = this.state
     const url = value.id ? `/contacts/${value.id}` : '/contacts'
 
-    api.post(url, changes)
-      .then(response => this.setState({value: response.data.item, changes: [], expandedSection: nextSection}))
+    api.post(url, [changes])
+      .then(response => this.setState({value: response.data.items[0], changes: [], expandedSection: nextSection}))
   }
 
   renderSection = (label: string, icon: string, fields: FieldDescription[]) => {
@@ -261,6 +261,19 @@ export default class ContactEdit extends React.Component<Props, State> {
     }
   }
 
+  renderOpenHouse = () => {
+    const { open_house } = this.state.value
+    if (open_house) {
+      return <Elevation className="contact-section" z={3}>
+        <List>
+          <SimpleListItem graphic="home">Visited <strong>{open_house.name}</strong></SimpleListItem>
+        </List>
+      </Elevation>
+    } else {
+      return null;
+    }
+  }
+
   render() {
     const { loading } = this.state;
 
@@ -273,7 +286,7 @@ export default class ContactEdit extends React.Component<Props, State> {
     }
 
     return (
-      <AppFrame>
+      <AppFrame bodyClass="primary grey">
         <div className="contact-header">
           <h1 className="mdc-typography--headline4">{this.getTitle()}</h1>
           <SimpleChip leadingIcon="email" text="Email" />
@@ -285,6 +298,8 @@ export default class ContactEdit extends React.Component<Props, State> {
               { key: "company", label: "Company", width: 50 },
               { key: "buyer_name", label: "On Behalf Of", width: 50 },
             ])}
+
+          { this.renderOpenHouse() }
 
           {this.renderSection("Email", "email", [
             { key: "email_personal", label: "Personal" },
@@ -301,9 +316,15 @@ export default class ContactEdit extends React.Component<Props, State> {
             { key: "address_state", label: "State", width: 20, },
             { key: "address_zip", label: "Zip", width: 30 }
           ])}
-          {this.renderSection("Mortgage", "attach_money", [
+          {this.renderSection("Mortgage", "account_balance", [
             { key: "mortgage_broker", label: "Mortgage Broker", width: 50 },
             { key: "mortgage_company", label: "Mortgage Company", width: 50 },
+          ])}
+          {this.renderSection("Broker", "work", [
+            { key: "agent_name", label: "Broker Name", width: 50 },
+            { key: "agent_company", label: "Company", width: 50 },
+            { key: "agent_phone", label: "Phone", width: 50 },
+            { key: "agent_email", label: "Email", width: 50 },
           ])}
           {this.renderNotesSection()}
           {this.renderDelete()}

@@ -11,6 +11,7 @@ import { Store } from "src/store";
 
 type Props = {
   store?: Store
+  bodyClass?: string
   onQuery?: (query: string) => void
 }
 
@@ -35,7 +36,7 @@ export default class AppFrame extends React.Component<Props, State> {
   render() {
     const store = this.props.store!
     const user = store.user!
-    const { onQuery } = this.props
+    const { onQuery, bodyClass } = this.props
     const { query } = this.state
 
     const userBadge = <SimpleChip leadingIcon="face" text={`${user.first_name} ${user.last_name}`} />
@@ -61,7 +62,7 @@ export default class AppFrame extends React.Component<Props, State> {
               </List>
             </DrawerContent>
           </Drawer>
-          <DrawerAppContent>{this.props.children}</DrawerAppContent>
+          <DrawerAppContent className={bodyClass}>{this.props.children}</DrawerAppContent>
         </div>
       </div>
     );

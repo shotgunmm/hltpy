@@ -20,16 +20,19 @@ $primary: #1976d2;
   background: white;
 }
 
-.mdc-drawer__content {
-  height: 100%;
+.mdc-drawer {
   background: $primary;
-  flex: 0 0;
+  height: 100vh;
+  position: fixed;
+}
+
+.mdc-drawer__content {
   .mdc-list-item, .mdc-list-item__graphic {
     color: white;
   }
 }
 
-.rmwc-data-table__content {
+.rmwc-data-table, .rmwc-data-table__content {
   width: 100%;
 }
 
@@ -45,6 +48,14 @@ $primary: #1976d2;
   .mdc-drawer-app-content {
     flex-grow: 10;
     flex: 1;
+    margin-left: 255px;
+    min-height: 100vh;
+    &.grey {
+      background: #efebe9;
+    }
+    &.secondary {
+      padding: 15px;
+    }
   }
 }
 
@@ -55,7 +66,6 @@ $primary: #1976d2;
 }
 
 .contact-body {
-  background: #efebe9;
   padding: 1.5rem;
 }
 
