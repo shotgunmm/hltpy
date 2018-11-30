@@ -1,13 +1,15 @@
 import { Button, ButtonIcon } from '@rmwc/button';
-import { List, ListItem, ListItemGraphic, ListItemMeta, ListItemPrimaryText, ListItemSecondaryText, ListItemText } from '@rmwc/list';
+import { List, ListItem, ListItemGraphic, ListItemMeta, ListItemPrimaryText, ListItemSecondaryText, ListItemText, SimpleListItem } from '@rmwc/list';
 import TextField from '@rmwc/textfield';
+import * as moment from 'moment';
 import * as React from 'react';
 import { RelatedItemsEditor } from './RelatedItemsEditor';
-import moment = require('moment');
 
 
 
 export default class ContactRemindersSection extends RelatedItemsEditor<Contact, ContactReminder> {
+  getSectionLabel() { return "Reminders" }
+
   getChildren(item: Contact) {
     return item.reminders || []
   }
@@ -19,21 +21,31 @@ export default class ContactRemindersSection extends RelatedItemsEditor<Contact,
   getUrlForChild = (item: ContactReminder) => {
     const { value } = this.props
     if (item.id) {
-      return `/contact/${value.id}/reminders/${item.id}`
+      return `/contacts/${value.id}/reminders/${item.id}`
     } else {
-      return `/contact/${value.id}/reminders`
+      return `/contacts/${value.id}/reminders`
     }
   }
 
   renderRow = (reminder: ContactReminder) => {
-      return <ListItem key={reminder.id} className={reminder.seen ? 'reminder-seen' : (reminder.is_active ? 'reminder-active' : '')}>
+    return <ListItem
+      onClick={() => this.startEdit(reminder)}
+      key={reminder.id}
+      className={reminder.seen ? 'reminder-seen' : (reminder.is_active ? 'reminder-active' : '')}>
           <ListItemGraphic icon={(reminder.is_active && !reminder.seen) ? 'notifications_active' : 'notifications_none'} />
           <ListItemText>
             <ListItemPrimaryText>{reminder.note}</ListItemPrimaryText>
             <ListItemSecondaryText>{moment(reminder.date).fromNow()}</ListItemSecondaryText>
           </ListItemText>
-        <ListItemMeta className="clickable" icon={reminder.seen ? null : 'check'} {...{ onClick: () => this.setReminderSeen(reminder) }}/>
+      <ListItemMeta
+        className="clickable"
+        icon={reminder.seen ? null : 'check'}
+        {...{ onClick: (evt: any) => { evt.stopPropagation(); this.updateChild(reminder, { seen: true }) } }} />
         </ListItem>
+  }
+
+  renderNewButton = () => {
+    return <SimpleListItem onClick={() => this.startEdit(null)} key="new" className="new-button" text="Create a new reminder..." graphic="notifications_none" />
   }
 
   renderEditor = (reminder: ContactReminder) => {

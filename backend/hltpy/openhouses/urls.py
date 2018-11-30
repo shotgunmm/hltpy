@@ -8,4 +8,3 @@ urlpatterns = [
     path("<house_key>/buyer", kiosk_views.kiosk_form, {"kind": "buyer"}),
     path("<house_key>/broker", kiosk_views.kiosk_form, {"kind": "broker"}),
 ]
-

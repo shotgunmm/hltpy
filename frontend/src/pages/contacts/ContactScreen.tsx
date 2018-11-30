@@ -1,13 +1,12 @@
 import Button, { ButtonIcon } from "@rmwc/button";
 import { CircularProgress } from "@rmwc/circular-progress";
-import { DataTable, DataTableBody, DataTableCell, DataTableContent, DataTableHead, DataTableHeadCell, DataTableRow } from "@rmwc/data-table";
+import { DataTable, DataTableBody, DataTableContent, DataTableHead, DataTableHeadCell, DataTableRow } from "@rmwc/data-table";
 import { Fab } from '@rmwc/fab';
-import { Icon } from '@rmwc/icon';
-import { IconButton } from '@rmwc/icon-button';
 import * as React from "react";
 import { Link } from 'react-router-dom';
 import AppFrame from "src/components/AppFrame";
 import api from "src/store/api";
+import ContactRow from "./ContactRow";
 
 type State = {
   items: Contact[];
@@ -21,14 +20,14 @@ export default class ContactScreen extends React.Component<{}, State> {
     this.setState({ loading: true });
     const query = this.state ? this.state.query : "";
     api
-      .get("/contacts?q=" + query)
+      .get("/contacts/?q=" + query)
       .then(res => {
         this.setState({ items: res.data.items as Contact[], stars: res.data.stars as number[], loading: false })
         this.forceUpdate()
       });
   };
 
-  headerColumns = () => ["", "Name", "Email", "Phone", "Address"];
+  headerColumns = () => ["Name", "Email", "Phone", "Address"];
 
   componentWillMount() {
     this.setState({ query: "" })
@@ -61,39 +60,14 @@ export default class ContactScreen extends React.Component<{}, State> {
 
   renderBody = () => this.state.items.map(this.renderRow);
 
-  renderRow = (value: Contact) => (
-    <DataTableRow key={value.id}> 
-      <DataTableCell>
-        { this.state.stars.indexOf(value.id) > -1 ? 
-          <Icon icon="star" className="favorite" onClick={() => this.setStar(value.id, false) } /> :
-          <Icon icon="star_border" className="favorite" onClick={() => this.setStar(value.id, true) } />
-        }
-      </DataTableCell>
-      <DataTableCell>
-        {value.first_name} {value.last_name}
-        <br /> <b>{value.state}</b>
-        {value.reminder_due && <div className="contact-list-reminder">
-          <Icon icon="notifications_active" /> { value.reminder_due.note }
-        </div>}
-      </DataTableCell>
-      <DataTableCell>{value.email_personal || value.email_work}</DataTableCell>
-      <DataTableCell>
-        {value.phone_mobile || value.phone_home || value.phone_work}
-      </DataTableCell>
-      <DataTableCell>
-        {value.address_street && `${value.address_street}, ${value.address_city}`}
-      </DataTableCell>
-      <DataTableCell>
-        <IconButton icon="edit" {...{tag: Link, to: `/contacts/${value.id}`}} />
-      </DataTableCell>
-    </DataTableRow>
-  );
+  renderRow = (value: Contact) => 
+    <ContactRow key={value.id} value={value} onStar={this.setStar} starred={value.id in this.state.stars}/>
 
   render() {
     const { loading } = this.state;
     return (
       <AppFrame onQuery={this.setQuery}>
-        <DataTable>
+        <DataTable className="big-table">
           <DataTableContent>
             {this.renderHeader()}
             <DataTableBody>

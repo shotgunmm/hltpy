@@ -19,9 +19,11 @@ type Contact = {
   updated: string
   open_house: OpenHouse
   events: ContactEvent[] | null
+  starred: boolean
   reminders: ContactReminder[] | null
   reminder_due: ContactReminder | null
   team_members: ContactTeamMember[]
+  notes: ContactNote[] | null
 }
 
 type ContactEvent = {
@@ -35,6 +37,12 @@ type ContactEvent = {
   created: string
 }
 
+type ContactNote = {
+  id: number
+  text: string
+  shared: boolean
+  created: string
+}
 
 type ContactReminder = {
   id: number

@@ -1,8 +1,9 @@
 import json
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
 from django.db.models.fields.files import FieldFile
-from django.http import JsonResponse, HttpRequest
+from django.http import HttpRequest, JsonResponse
 
 
 def render_json(data, **kwargs):
@@ -42,3 +43,9 @@ class ModelEncoder(DjangoJSONEncoder):
 
 def extract(value, *keys):
     return {key: getattr(value, key) for key in keys}
+
+def parse_bool(value):
+    if value in ['true', 'True', True, '1', 'on']:
+        return True
+    else:
+        return False

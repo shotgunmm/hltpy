@@ -8,8 +8,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from ..utils import render_json
-from .models import Contact, ContactReminder, ContactStar, ContactTeamMember
+from ..utils import parse_bool, render_json
+from .models import (Contact, ContactNote, ContactReminder, ContactStar,
+                     ContactTeamMember)
 
 ALLOWED_FIELDS = ['first_name', 'last_name', 'state',
     'phone_mobile', 'phone_home', 'phone_work',
@@ -63,7 +64,7 @@ def all_contacts(request):
 def get_contact(request, contact_id=None):
     if 'GET' == request.method:
         contact = get_object_or_404(Contact, id=contact_id)
-        return render_json({'item': contact.as_json(full=True)})
+        return render_json({'item': contact.as_json(full=True, user=request.user)})
 
     elif 'POST' == request.method:
         contacts = []
@@ -79,22 +80,12 @@ def get_contact(request, contact_id=None):
             for field, value in data.items():
                 if field in ALLOWED_FIELDS:
                     setattr(contact, field, str(value))
-            if 'note' in data:
-                contact.event_set.create(owner=request.user, kind='note', note=data['note'])
 
             contact.save()
 
-            if 'reminder' in data:
-                contact.reminder_set.create(user=request.user, date=data['reminder']['date'], note=data['reminder']['note'])
-
-            if 'reminder_seen' in data:
-                reminder = get_object_or_404(ContactReminder, id=data['reminder_seen'], contact=contact, user=request.user)
-                reminder.seen = not reminder.seen
-                reminder.save()
-
             contacts.append(contact)
 
-        return render_json({'items': [contact.as_json(full=True) for contact in contacts]})
+        return render_json({'items': [contact.as_json(full=True, user=request.user) for contact in contacts]})
 
     elif 'DELETE' == request.method:
         contact = get_object_or_404(Contact, id=contact_id) 
@@ -104,9 +95,56 @@ def get_contact(request, contact_id=None):
         return render_json({'success': True})
     
 
+#############################
+# Notes
+#############################
+
 @login_required
-def add_reminder(request, contact_id):
+def save_note(request, contact_id, note_id=None):
     contact = get_object_or_404(Contact, id=contact_id)
+
+    if note_id:
+        note = contact.note_set.get(id=note_id)
+    else:
+        note = ContactNote(owner=request.user, contact=contact)
+
+    if 'text' in request.data:
+        note.text = request.data['text']
+    if 'shared' in request.data:
+        note.shared = parse_bool(request.data['shared'])
+
+    note.save()
+
+    return render_json({'item': contact.as_json(full=True, user=request.user)})
+
+
+#############################
+# Reminders
+#############################
+
+@login_required
+def save_reminder(request, contact_id, reminder_id=None):
+    contact = get_object_or_404(Contact, id=contact_id)
+
+    if reminder_id:
+        reminder = contact.reminder_set.get(id=reminder_id)
+    else:
+        reminder = ContactReminder(user=request.user, contact=contact)
+
+    if 'date' in request.data:
+        reminder.date = request.data['date']
+    if 'note' in request.data:
+        reminder.note = request.data['note']
+    reminder.seen = 'seen' in request.data
+
+    reminder.save()
+
+    return render_json({'item': contact.as_json(full=True, user=request.user)})
+
+
+#############################
+# Members
+#############################
 
 @login_required
 def search_members(request, query):
@@ -133,7 +171,7 @@ def edit_member(request, contact_id, member_id=None):
 
         member.contacts.add(contact)
 
-    return render_json({'item': contact.as_json(full=True)})
+    return render_json({'item': contact.as_json(full=True, user=request.user)})
 
 
 @login_required
@@ -143,7 +181,7 @@ def attach_member(request, contact_id, member_id):
 
     member.contacts.add(contact)
 
-    return render_json({'item': contact.as_json(full=True)})
+    return render_json({'item': contact.as_json(full=True, user=request.user)})
 
 
 @login_required

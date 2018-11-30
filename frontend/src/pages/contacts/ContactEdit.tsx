@@ -3,13 +3,14 @@ import { SimpleChip } from '@rmwc/chip';
 import { CircularProgress } from "@rmwc/circular-progress";
 import { SimpleDialog } from '@rmwc/dialog';
 import { Elevation } from "@rmwc/elevation";
-import { List, ListItem, ListItemGraphic, ListItemMeta, ListItemPrimaryText, ListItemSecondaryText, ListItemText, SimpleListItem } from "@rmwc/list";
+import { List, SimpleListItem } from "@rmwc/list";
 import { TextField } from "@rmwc/textfield";
-import * as moment from 'moment';
 import * as React from "react";
 import { RouteComponentProps } from "react-router";
 import AppFrame from "src/components/AppFrame";
 import api from "src/store/api";
+import ContactNotesSection from "./ContactNotesSection";
+import ContactRemindersSection from "./ContactRemindersSection";
 import ContactTeamMemberTable from "./ContactTeamMemberTable";
 
 type FieldDescription = {
@@ -97,70 +98,6 @@ export default class ContactEdit extends React.Component<Props, State> {
     this.setState({value: value})
   }
 
-  renderReminders = () => {
-    const value = this.state.value!
-    const { newReminder, reminderNote, reminderDate } = this.state
-
-    return <Elevation className="contact-section contact-section-edit" z={1}>
-        <List>
-        {!newReminder && <SimpleListItem
-            key="new"
-            graphic="notifications_none"
-            secondaryText="Set a reminder..."
-            onClick={this.setReminder}
-          />}
-          {newReminder && <div key="edit">
-            <TextField
-              withLeadingIcon="notifications"
-              style={{width: "50%"}}
-              label="Remind Me to"
-              value={reminderNote}
-              onChange={this.setReminderNote}
-            />
-            <TextField
-              label="On"
-              type="date"
-              value={reminderDate}
-              onChange={this.setReminderDate}
-            />
-            <Button onClick={this.saveReminder}><ButtonIcon icon="save" /> Save</Button>
-          </div>}
-
-          {value.reminders!.map(reminder => {
-          return <ListItem key={reminder.id} className={reminder.seen ? 'reminder-seen' : (reminder.is_active ? 'reminder-active' : '')}>
-              <ListItemGraphic icon={(reminder.is_active && !reminder.seen) ? 'notifications_active' : 'notifications_none'} />
-              <ListItemText>
-                <ListItemPrimaryText>{reminder.note}</ListItemPrimaryText>
-                <ListItemSecondaryText>{moment(reminder.date).fromNow()}</ListItemSecondaryText>
-              </ListItemText>
-            <ListItemMeta className="clickable" icon={reminder.seen ? null : 'check'} {...{ onClick: () => this.setReminderSeen(reminder) }}/>
-            </ListItem>
-          })}
-        </List>
-      </Elevation>
-  }
-
-  setReminder = () => 
-    this.setState({newReminder: !this.state.newReminder})
-
-  setReminderNote = (evt: any) =>
-    this.setState({reminderNote: evt.target.value || ' ' })
-
-  setReminderDate = (evt: any) => {
-    this.setState({reminderDate: evt.target.value})
-  }
-
-  setReminderSeen = (reminder: ContactReminder) => {
-    this.saveSection(null, {reminder_seen: reminder.id})
-  }
-
-  saveReminder = () => {
-    const { reminderNote, reminderDate } = this.state 
-    const changes = {reminder: {note: reminderNote, date: reminderDate }}
-    this.saveSection(null, changes)
-    this.setState({newReminder: false, reminderDate: '', reminderNote: ''})
-  }
-
   saveSection = (nextSection: string | null = null, changes: {} | null = null) => {
     const { value } = this.state
     changes = changes || this.state.changes
@@ -185,7 +122,6 @@ export default class ContactEdit extends React.Component<Props, State> {
           <List>
             {setFields.map(field => {
               return <SimpleListItem
-                // style={{width: field.width || "100%"}}
                 className={field.width ? "field narrow" : "field wide"}
                 key={field.key}
                 graphic={icon}
@@ -262,46 +198,6 @@ export default class ContactEdit extends React.Component<Props, State> {
     }
   }
 
-  renderNotesSection = () => {
-    const notes = (this.state.value.events || []).filter(n => n.note);
-    const { newNote } = this.state
-
-    return (
-      <Elevation className="contact-section" z={3} key="Notes">
-        <span className="mdc-typography--button">
-          Notes
-        </span>
-        <List>
-          {!newNote && <SimpleListItem
-            key="new"
-            graphic="note"
-            secondaryText="Click to write a note..."
-            onClick={this.setNote}
-          />}
-          {newNote && <TextField
-            textarea
-            label="New Note"
-            value={newNote}
-            onChange={this.setNote}
-          />}
-          { newNote && <Button onClick={this.saveNote}>
-              <ButtonIcon>save</ButtonIcon> Save
-            </Button>
-          }
-          {notes.map(note => (
-            <SimpleListItem
-              key={note.id}
-              graphic="note"
-              text={note.note}
-              secondaryText={new Date(note.created).toLocaleDateString()}
-            />
-          ))}
-        </List>
-      </Elevation>
-    );
-  };
-
-
   showDelete = () => {
     this.setState({ deleteOpen: true })
   }
@@ -376,7 +272,9 @@ export default class ContactEdit extends React.Component<Props, State> {
               { key: "buyer_name", label: "On Behalf Of", width: 50 },
             ])}
 
-          { this.renderReminders() }
+          <ContactRemindersSection value={value} onUpdate={this.onUpdate} />
+
+          <ContactNotesSection value={value} onUpdate={this.onUpdate} />
 
           { this.renderOpenHouse() }
 
@@ -398,7 +296,6 @@ export default class ContactEdit extends React.Component<Props, State> {
             { key: "address_state", label: "State", width: 20, },
             { key: "address_zip", label: "Zip", width: 30 }
           ])}
-          {this.renderNotesSection()}
           {this.renderDelete()}
         </div>
       </AppFrame>

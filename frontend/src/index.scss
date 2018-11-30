@@ -37,6 +37,10 @@ $primary: #1976d2;
   clear: both;
 }
 
+.big-table tr td {
+  height: 75px;
+}
+
 .root {
   min-height: 100vh;
 }
@@ -163,9 +167,46 @@ $primary: #1976d2;
 
 .rmwc-data-table.inner-table {
   border: none;
+  width: 100%;
   table {
     width: 80%;
   }
   overflow: hidden;
   clear: both;
+  td {
+    vertical-align: top;
+  }
+}
+
+.action-col {
+  text-align: right;
+  width: 150px;
+}
+
+.icon-col {
+  width: 17px;
+}
+
+.dateline {
+  font-size: 13px;
+  color: #666;
+}
+
+.new-button {
+  color: #666;
+  cursor: pointer;
+  &:hover {
+    color: black;
+  }
+}
+
+.table-editor {
+  background: white !important;
+  td { 
+    background: white !important;
+  }
+}
+
+.mdc-text-field, .mdc-text-field__input { 
+  background: white; 
 }

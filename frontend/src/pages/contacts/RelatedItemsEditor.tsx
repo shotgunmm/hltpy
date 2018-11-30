@@ -1,5 +1,5 @@
 import Button, { ButtonIcon } from '@rmwc/button';
-import { DataTable, DataTableBody, DataTableCell, DataTableRow } from '@rmwc/data-table';
+import { DataTable, DataTableBody, DataTableCell, DataTableContent, DataTableRow } from '@rmwc/data-table';
 import Elevation from '@rmwc/elevation';
 import * as React from 'react';
 import api from 'src/store/api';
@@ -8,7 +8,6 @@ type IdObject = { id: number | string }
 type Props<Parent, Child> = {
   value: Parent
   onUpdate: (value: Parent) => void
-  label: string
 }
 
 type State<Parent, Child> = {
@@ -19,6 +18,8 @@ type State<Parent, Child> = {
 
 export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends IdObject> extends React.Component<Props<Parent, Child>, State<Parent, Child>> {
   getCssClass() { return "contact-section " + this.constructor.name }
+
+  abstract getSectionLabel(): string
   abstract getChildren(item: Parent): Child[]
   abstract getEmptyChildValue(): Child
   abstract getUrlForChild(item: Child): string
@@ -36,7 +37,7 @@ export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends 
     return [];
   }
 
-  startEdit = (item: Child | null) {
+  startEdit = (item: Child | null) => {
     const value = item || this.getEmptyChildValue()
     this.setState({editedItem: value, newItem: item == null})
   }
@@ -47,7 +48,7 @@ export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends 
 
     return api.post(url, changes)
       .then(response => {
-        onUpdate(response.data)
+        onUpdate(response.data.item)
       })
   }
   saveChild = () => {
@@ -58,11 +59,11 @@ export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends 
   }
 
   deleteChild = (item: Child) => {
-    const { value, onUpdate } = this.props
+    const { onUpdate } = this.props
     if (item.id) {
       api.delete(this.getUrlForChild(item))
         .then(response => 
-          onUpdate(response.data)
+          onUpdate(response.data.item)
         )
     }
   }
@@ -79,20 +80,16 @@ export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends 
     })
   }
   renderContainer = () => {
-    const { value } = this.props
-    if (this.getChildren(value).length) {
-      return <DataTable className="inner-table">
-        {this.renderTableHeader()}
-        <DataTableBody>
-          { this.renderNewEditor('top') }
-          { this.renderItems() }
-          { this.renderNewEditor('bottom') }
+    return <DataTable className="inner-table">
+      <DataTableContent>
+      {this.renderTableHeader()}
+      <DataTableBody>
+        { this.renderNewEditor('top') }
+        { this.renderItems() }
+        { this.renderNewEditor('bottom') }
         </DataTableBody>
-
-      </DataTable>
-    } else {
-      return []
-    }
+      </DataTableContent>
+    </DataTable>
   }
 
   renderNewButton = () => 
@@ -103,6 +100,7 @@ export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends 
     </DataTableRow> 
 
   setField = (field: keyof Child) => (evt: any) => {
+    console.log(evt)
     const { changes } = this.state
     const editedItem = this.state.editedItem as object
     const newItem = { ...editedItem, [field]: evt.target.value }
@@ -112,23 +110,24 @@ export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends 
   
 
   renderNewEditor = (position: 'top' | 'bottom') => {
-    const { editedItem } = this.state
+    const { editedItem, newItem } = this.state
 
-    if (position === this.getNewEditorPosition() && !editedItem) {
-      return this.renderNewButton();
-    } else {
-      return [];
+    if (position === this.getNewEditorPosition()) {
+      if (editedItem && newItem) {
+        return this.renderEditor(editedItem);
+      } else if (!editedItem) {
+        return this.renderNewButton();
+      }
     }
+
+    return []
   }
 
 
   baseRender = () => {
-    const { label } = this.props
-    const { editedItem } = this.state
-
     return <Elevation z={1} className={this.getCssClass()}>
       <span className="mdc-typography--button">
-        { label }
+        { this.getSectionLabel() }
       </span>
 
       { this.renderContainer() }

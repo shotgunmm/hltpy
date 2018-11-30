@@ -83,7 +83,7 @@ class Contact(models.Model):
         'email_work', 'address_street', 'address_city', 'address_state', 'agent_name', 'agent_company', 'agent_phone',
         'agent_email', 'mortgage_broker', 'mortgage_company', 'company']
 
-    def as_json(self, full=False):
+    def as_json(self, full=False, user=None):
         fields = self.EDITABLE_FIELDS + self.READONLY_FIELDS
         result = extract(self, *fields)
 
@@ -91,6 +91,9 @@ class Contact(models.Model):
             result['events'] = [_.as_json() for _ in self.event_set.all().order_by('-created')]
             result['reminders'] = [_.as_json() for _ in self.reminder_set.all()]
             result['team_members'] = [_.as_json() for _ in self.team_member_set.all()]
+
+            notes = self.note_set.filter(Q(owner=user) | Q(shared=True))
+            result['notes'] = [_.as_json() for _ in notes]
 
         if full and self.open_house_visit_id != None:
             try: 
@@ -123,6 +126,26 @@ class ContactEvent(models.Model):
 
     def as_json(self):
         return extract(self, 'id', 'kind', 'field_changed', 'value_before', 'value_after', 'note', 'created')
+
+class ContactNote(models.Model):
+    contact = models.ForeignKey(
+        Contact, on_delete=models.CASCADE, related_name='note_set')
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
+    shared = models.BooleanField(default=False)
+
+    text = models.TextField(default='')
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created']
+
+    def as_json(self):
+        return extract(self, 'id', 'shared', 'text', 'created')
 
 
 class ContactStar(models.Model):
