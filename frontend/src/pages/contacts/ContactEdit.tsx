@@ -3,12 +3,14 @@ import { SimpleChip } from '@rmwc/chip';
 import { CircularProgress } from "@rmwc/circular-progress";
 import { SimpleDialog } from '@rmwc/dialog';
 import { Elevation } from "@rmwc/elevation";
-import { List, SimpleListItem } from "@rmwc/list";
+import { List, ListItem, ListItemGraphic, ListItemMeta, ListItemPrimaryText, ListItemSecondaryText, ListItemText, SimpleListItem } from "@rmwc/list";
 import { TextField } from "@rmwc/textfield";
+import * as moment from 'moment';
 import * as React from "react";
 import { RouteComponentProps } from "react-router";
 import AppFrame from "src/components/AppFrame";
 import api from "src/store/api";
+import ContactTeamMemberTable from "./ContactTeamMemberTable";
 
 type FieldDescription = {
   key: string;
@@ -25,6 +27,9 @@ type State = {
   expandedSection: string | null
   isNew: boolean
   newNote: string
+  newReminder: boolean
+  reminderNote: string
+  reminderDate: string
   saving: boolean
   deleteOpen: boolean
 };
@@ -42,13 +47,16 @@ export default class ContactEdit extends React.Component<Props, State> {
   componentWillMount() {
     const { id } = this.props.match.params;
     this.setState({
-      value: {} as Contact,
+      value: {reminders: [], team_members: []} as any as Contact,
       saving: false,
       loading: true,
       expandedSection: null,
       isNew: false,
       changes: {},
       newNote: '',
+      newReminder: false,
+      reminderNote: '',
+      reminderDate: '',
       deleteOpen: false
     });
     if (id) {
@@ -85,9 +93,77 @@ export default class ContactEdit extends React.Component<Props, State> {
     };
   };
 
+  onUpdate = (value: Contact) => {
+    this.setState({value: value})
+  }
 
-  saveSection = (nextSection: string | null = null) => {
-    const { value, changes } = this.state
+  renderReminders = () => {
+    const value = this.state.value!
+    const { newReminder, reminderNote, reminderDate } = this.state
+
+    return <Elevation className="contact-section contact-section-edit" z={1}>
+        <List>
+        {!newReminder && <SimpleListItem
+            key="new"
+            graphic="notifications_none"
+            secondaryText="Set a reminder..."
+            onClick={this.setReminder}
+          />}
+          {newReminder && <div key="edit">
+            <TextField
+              withLeadingIcon="notifications"
+              style={{width: "50%"}}
+              label="Remind Me to"
+              value={reminderNote}
+              onChange={this.setReminderNote}
+            />
+            <TextField
+              label="On"
+              type="date"
+              value={reminderDate}
+              onChange={this.setReminderDate}
+            />
+            <Button onClick={this.saveReminder}><ButtonIcon icon="save" /> Save</Button>
+          </div>}
+
+          {value.reminders!.map(reminder => {
+          return <ListItem key={reminder.id} className={reminder.seen ? 'reminder-seen' : (reminder.is_active ? 'reminder-active' : '')}>
+              <ListItemGraphic icon={(reminder.is_active && !reminder.seen) ? 'notifications_active' : 'notifications_none'} />
+              <ListItemText>
+                <ListItemPrimaryText>{reminder.note}</ListItemPrimaryText>
+                <ListItemSecondaryText>{moment(reminder.date).fromNow()}</ListItemSecondaryText>
+              </ListItemText>
+            <ListItemMeta className="clickable" icon={reminder.seen ? null : 'check'} {...{ onClick: () => this.setReminderSeen(reminder) }}/>
+            </ListItem>
+          })}
+        </List>
+      </Elevation>
+  }
+
+  setReminder = () => 
+    this.setState({newReminder: !this.state.newReminder})
+
+  setReminderNote = (evt: any) =>
+    this.setState({reminderNote: evt.target.value || ' ' })
+
+  setReminderDate = (evt: any) => {
+    this.setState({reminderDate: evt.target.value})
+  }
+
+  setReminderSeen = (reminder: ContactReminder) => {
+    this.saveSection(null, {reminder_seen: reminder.id})
+  }
+
+  saveReminder = () => {
+    const { reminderNote, reminderDate } = this.state 
+    const changes = {reminder: {note: reminderNote, date: reminderDate }}
+    this.saveSection(null, changes)
+    this.setState({newReminder: false, reminderDate: '', reminderNote: ''})
+  }
+
+  saveSection = (nextSection: string | null = null, changes: {} | null = null) => {
+    const { value } = this.state
+    changes = changes || this.state.changes
     const url = value.id ? `/contacts/${value.id}` : '/contacts'
 
     api.post(url, [changes])
@@ -225,6 +301,7 @@ export default class ContactEdit extends React.Component<Props, State> {
     );
   };
 
+
   showDelete = () => {
     this.setState({ deleteOpen: true })
   }
@@ -275,7 +352,7 @@ export default class ContactEdit extends React.Component<Props, State> {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, value } = this.state;
 
     if (loading) {
       return (
@@ -299,6 +376,8 @@ export default class ContactEdit extends React.Component<Props, State> {
               { key: "buyer_name", label: "On Behalf Of", width: 50 },
             ])}
 
+          { this.renderReminders() }
+
           { this.renderOpenHouse() }
 
           {this.renderSection("Email", "email", [
@@ -310,21 +389,14 @@ export default class ContactEdit extends React.Component<Props, State> {
             { key: "phone_home", label: "Home", width: 50 },
             { key: "phone_times", label: "Best time to call" }
           ])}
+
+          <ContactTeamMemberTable contact={value} onUpdate={this.onUpdate} />
+
           {this.renderSection("Home Address", "location_on", [
             { key: "address_street", label: "Street Address" },
             { key: "address_city", label: "City", width: 50, },
             { key: "address_state", label: "State", width: 20, },
             { key: "address_zip", label: "Zip", width: 30 }
-          ])}
-          {this.renderSection("Mortgage", "account_balance", [
-            { key: "mortgage_broker", label: "Mortgage Broker", width: 50 },
-            { key: "mortgage_company", label: "Mortgage Company", width: 50 },
-          ])}
-          {this.renderSection("Broker", "work", [
-            { key: "agent_name", label: "Broker Name", width: 50 },
-            { key: "agent_company", label: "Company", width: 50 },
-            { key: "agent_phone", label: "Phone", width: 50 },
-            { key: "agent_email", label: "Email", width: 50 },
           ])}
           {this.renderNotesSection()}
           {this.renderDelete()}

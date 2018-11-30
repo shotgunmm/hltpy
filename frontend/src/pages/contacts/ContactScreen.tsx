@@ -72,6 +72,9 @@ export default class ContactScreen extends React.Component<{}, State> {
       <DataTableCell>
         {value.first_name} {value.last_name}
         <br /> <b>{value.state}</b>
+        {value.reminder_due && <div className="contact-list-reminder">
+          <Icon icon="notifications_active" /> { value.reminder_due.note }
+        </div>}
       </DataTableCell>
       <DataTableCell>{value.email_personal || value.email_work}</DataTableCell>
       <DataTableCell>

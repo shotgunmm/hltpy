@@ -34,6 +34,7 @@ $primary: #1976d2;
 
 .rmwc-data-table, .rmwc-data-table__content {
   width: 100%;
+  clear: both;
 }
 
 .root {
@@ -122,4 +123,49 @@ $primary: #1976d2;
   input {
     padding-top: 6px !important;
   }
+}
+
+.reminder-active {
+  font-weight: 500;
+
+  .mdc-list-item__graphic {
+    color: orange;
+  }
+}
+
+.reminder-seen {
+  .mdc-list-item__primary-text {
+    text-decoration: line-through;
+  }
+  color: #999;
+}
+
+.contact-list-reminder {
+  .material-icons { 
+    margin-top: 2px;
+    color: orange;
+    font-size: 16px;
+  }
+
+  color: $primary;
+}
+
+.mdc-icon-button {
+  color: #666;
+  &:hover {
+    color: #333;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.rmwc-data-table.inner-table {
+  border: none;
+  table {
+    width: 80%;
+  }
+  overflow: hidden;
+  clear: both;
 }

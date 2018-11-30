@@ -19,6 +19,9 @@ type Contact = {
   updated: string
   open_house: OpenHouse
   events: ContactEvent[] | null
+  reminders: ContactReminder[] | null
+  reminder_due: ContactReminder | null
+  team_members: ContactTeamMember[]
 }
 
 type ContactEvent = {
@@ -30,4 +33,23 @@ type ContactEvent = {
   note: string 
   extra: any | null
   created: string
+}
+
+
+type ContactReminder = {
+  id: number
+  date: string
+  note: string
+  seen: boolean
+  is_active: boolean
+}
+
+type ContactTeamMember = {
+  id: number 
+  name: string
+  role: string
+  company: string
+  phone_number: string
+  email: string
+  note: string
 }

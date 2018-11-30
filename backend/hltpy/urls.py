@@ -29,6 +29,10 @@ urlpatterns = [
     path('api/contacts/import', contacts_import.import_contacts),
     path('api/contacts/<int:contact_id>', contacts.get_contact),
     path('api/contacts/<int:contact_id>/star', contacts.set_star),
+    path('api/contacts/<int:contact_id>/members', contacts.edit_member),
+    path('api/contacts/<int:contact_id>/members/<int:member_id>', contacts.edit_member),
+    path('api/contacts/<int:contact_id>/members/<int:member_id>/attach', contacts.attach_member),
+    path('api/members', contacts.search_members),
     path('api/openhouses', openhouses.all_records),
     path('api/openhouses/<int:record_id>', openhouses.get_record),
 ]
