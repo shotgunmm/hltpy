@@ -55,7 +55,7 @@ export default class ContactNotesSection extends RelatedItemsEditor<Contact, Con
 
   renderNewButton = () => {
     return <DataTableRow className="new-button" onClick={() => this.startEdit(null)}>
-      <DataTableCell><Icon icon="note" /></DataTableCell>
+      <DataTableCell className="icon-col"><Icon icon="note" /></DataTableCell>
       <DataTableCell>
         Create a note...
       </DataTableCell>

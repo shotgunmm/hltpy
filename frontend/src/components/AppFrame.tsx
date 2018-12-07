@@ -1,12 +1,13 @@
-import { SimpleChip } from '@rmwc/chip';
+import { Chip } from '@rmwc/chip';
 import { Drawer, DrawerAppContent, DrawerContent } from "@rmwc/drawer";
 import { List, SimpleListItem } from "@rmwc/list";
 import { TextField } from "@rmwc/textfield";
-import { SimpleTopAppBar } from "@rmwc/top-app-bar";
+import { TopAppBar, TopAppBarRow, TopAppBarSection } from "@rmwc/top-app-bar";
 import { debounce } from "lodash";
 import { inject, observer } from 'mobx-react';
 import * as React from "react";
 import { Link } from "react-router-dom";
+import logo from 'src/assets/blre-logo.png';
 import { Store } from "src/store";
 
 type Props = {
@@ -39,7 +40,7 @@ export default class AppFrame extends React.Component<Props, State> {
     const { onQuery, bodyClass } = this.props
     const { query } = this.state
 
-    const userBadge = <SimpleChip leadingIcon="face" text={`${user.first_name} ${user.last_name}`} />
+    const userBadge = <Chip leadingIcon="face" text={`${user.first_name} ${user.last_name}`} />
 
     const searchBar = onQuery ? 
       <TextField withLeadingIcon="search" className="search-field" key="search" placeholder="Search..." outlined dense value={query} onChange={this.setQuery} />
@@ -47,7 +48,17 @@ export default class AppFrame extends React.Component<Props, State> {
 
     return (
       <div>
-        <SimpleTopAppBar title="HLTConnect" fixed startContent={searchBar} endContent={userBadge}/>
+        <TopAppBar className="top-app-bar" fixed>
+          <TopAppBarRow>
+            <TopAppBarSection alignStart className="title">
+                <img src={logo} className="logo" alt="Better Living Real Estate"/>
+            </TopAppBarSection>
+            <TopAppBarSection alignStart>
+              {searchBar}
+            </TopAppBarSection>
+            <TopAppBarSection alignEnd>{userBadge}</TopAppBarSection>
+          </TopAppBarRow>
+        </TopAppBar>
         <div className="mdc-top-app-bar--fixed-adjust" />
         <div className="body-split">
           <Drawer open={true}>

@@ -9,6 +9,13 @@ from django.http import HttpRequest, JsonResponse
 def render_json(data, **kwargs):
     return JsonResponse(data, encoder=ModelEncoder, **kwargs)
 
+def choice(value, *opts):
+    if value in opts:
+        return value
+    else:
+        return opts[0]
+
+
 
 def JsonBodyMiddleware(get_response):
     def middleware(request: HttpRequest):

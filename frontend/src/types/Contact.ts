@@ -17,6 +17,7 @@ type Contact = {
   position: string
   created: string
   updated: string
+  tags: ContactTag[]
   open_house: OpenHouse
   events: ContactEvent[] | null
   starred: boolean
@@ -60,4 +61,9 @@ type ContactTeamMember = {
   phone_number: string
   email: string
   note: string
+}
+
+type ContactTag = {
+  id: number
+  tag: string
 }

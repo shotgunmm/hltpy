@@ -23,6 +23,14 @@ class ContactManager(models.Manager):
         
         return qs.filter(q_chain)
 
+    def get_for_user(self, id, user):
+        contact = self.get_queryset().get(id=id)
+        if contact.owner == user:
+            return contact
+        elif contact.team_member_set.filter(user=user).exists():
+            return contact
+        else:
+            raise Contact.DoesNotExist
 
 class Contact(models.Model):
     owner = models.ForeignKey(
@@ -83,9 +91,17 @@ class Contact(models.Model):
         'email_work', 'address_street', 'address_city', 'address_state', 'agent_name', 'agent_company', 'agent_phone',
         'agent_email', 'mortgage_broker', 'mortgage_company', 'company']
 
+    @property
+    def email(self):
+        return self.email_personal or self.email_work
+
+    def get_full_name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
     def as_json(self, full=False, user=None):
         fields = self.EDITABLE_FIELDS + self.READONLY_FIELDS
         result = extract(self, *fields)
+        result['tags'] = [_.as_json() for _ in self.tag_set.all()]
 
         if full:
             result['events'] = [_.as_json() for _ in self.event_set.all().order_by('-created')]
@@ -157,6 +173,15 @@ class ContactStar(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+class ContactTag(models.Model):
+    contacts = models.ManyToManyField('Contact', related_name='tag_set')
+    tag = models.CharField(max_length=255, unique=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def as_json(self):
+        return {'id': self.id, 'tag': self.tag}
 
 class ContactReminder(models.Model):
     contact = models.ForeignKey(

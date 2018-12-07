@@ -26,9 +26,13 @@ export default class ContactRow extends React.Component<Props, State> {
     return <DataTableRow key={value.id} onMouseEnter={() => this.setState({highlight: true})} onMouseLeave={() => this.setState({highlight: false})}> 
       <DataTableCell>
         {value.first_name} {value.last_name}
-        <br /> <b>{value.state}</b>
+        <div className="tag-set">
+          {value.tags.map(tag => <span className="tag" key={tag.id}>{tag.tag}</span>)}
+        </div>
       </DataTableCell>
-      <DataTableCell>{value.email_personal || value.email_work}</DataTableCell>
+      <DataTableCell>
+        <a href={"mailto:" + (value.email_personal || value.email_work)}>{ value.email_personal || value.email_work }</a>
+      </DataTableCell>
       <DataTableCell>
         {value.phone_mobile || value.phone_home || value.phone_work}
       </DataTableCell>
@@ -36,8 +40,6 @@ export default class ContactRow extends React.Component<Props, State> {
         {value.address_street && `${value.address_street}, ${value.address_city}`}
       </DataTableCell>
       <DataTableCell className="action-col">
-        {value.reminder_due &&
-          <Icon icon="notifications_active" className="favorite" /> }
         { starred &&
           <Icon icon="star" className="favorite" onClick={() => onStar(value.id, false)} /> }
         { highlight && !starred && 
@@ -46,9 +48,9 @@ export default class ContactRow extends React.Component<Props, State> {
         { highlight &&
           <IconButton icon="edit" {...{ tag: Link, to: `/contacts/${value.id}` }} />
         }
+        {value.reminder_due &&
+          <Icon icon="notifications_active" className="favorite" /> }
       </DataTableCell>
     </DataTableRow>
-
   }
-
 }

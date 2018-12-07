@@ -1,0 +1,24 @@
+<p>Dear {{ user.first_name }},</p>
+
+<p>Thank you for visiting our open house at {{ open_house.address }}. Included in this email is information that
+    we know you'll find helpful about the property.</p>
+
+<p>We'd enjoy the opportunity to answer any of your real estate questions and learn more about your personal real estate
+    needs. With over three decades of real estate experience, Better Living Real Estate is expert in the local real
+    estate market.</p>
+
+<p>Here's the contact information for the experts who hosted the open house today. Please feel free to text, email or
+    phone us, so we can learn more about your real estate needs, explain significant money saving services available to
+    you and answer any question you have about the property you visited today.</p>
+
+{% if open_house.brochure %}
+<p>To download a detailed brochure on the property, <a href="{{ open_house.brochure.url }}">please click here</a>.</p>
+{% endif %}
+
+<img src="{{ agent.associate.headshot }}" width="150" height="150"><br/>
+<p><strong>{{ agent.get_full_name }}</strong><br/>
+    Real Estate Agent
+    <br />
+    {% if agent.associate.phone_1 %}Phone: {{ agent.associate.phone_1 }}{% endif %}
+    {% if agent.associate.email %}Email: {{ agent.associate.email }}{% endif %}
+</p>

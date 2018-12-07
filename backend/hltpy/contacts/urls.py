@@ -14,4 +14,6 @@ urlpatterns = [
     path('<int:contact_id>/reminders/<int:reminder_id>', views.save_reminder),
     path('<int:contact_id>/notes', views.save_note),
     path('<int:contact_id>/notes/<int:note_id>', views.save_note),
+    path('<int:contact_id>/tags', views.save_tag),
+    path('<int:contact_id>/tags/<int:note_id>', views.delete_tag),
 ]

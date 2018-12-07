@@ -26,6 +26,10 @@ $primary: #1976d2;
   position: fixed;
 }
 
+.mdc-fab {
+  background: #b71c1c;
+}
+
 .mdc-drawer__content {
   .mdc-list-item, .mdc-list-item__graphic {
     color: white;
@@ -35,6 +39,22 @@ $primary: #1976d2;
 .rmwc-data-table, .rmwc-data-table__content {
   width: 100%;
   clear: both;
+}
+
+table {
+  thead {
+    th.sortable {
+      cursor: pointer;
+    }
+    th.sorted {
+      .material-icons {
+        float: right;
+      }
+
+      font-weight: bold;
+      background: lighten($primary, 50%);
+    }
+  }
 }
 
 .big-table tr td {
@@ -209,4 +229,30 @@ $primary: #1976d2;
 
 .mdc-text-field, .mdc-text-field__input { 
   background: white; 
+}
+
+.small-chips .mdc-chip {
+  scale: 0.8 !important;
+}
+
+
+.tag-set {
+  margin: 6px 0;
+  overflow: auto;
+  .tag {
+    font-size: 13px;
+    padding: 5px; 
+    background: #ddd;
+    border-radius: 10px;
+    margin-right: 8px;
+  }
+}
+
+.mdc-top-app-bar {
+  .title {
+    max-width: 230px;
+  }
+  .logo {
+    width: 120px;
+  }
 }

@@ -1,5 +1,4 @@
 import { Button, ButtonIcon } from "@rmwc/button";
-import { SimpleChip } from '@rmwc/chip';
 import { CircularProgress } from "@rmwc/circular-progress";
 import { SimpleDialog } from '@rmwc/dialog';
 import { Elevation } from "@rmwc/elevation";
@@ -11,12 +10,14 @@ import AppFrame from "src/components/AppFrame";
 import api from "src/store/api";
 import ContactNotesSection from "./ContactNotesSection";
 import ContactRemindersSection from "./ContactRemindersSection";
+import { ContactTags } from "./ContactTags";
 import ContactTeamMemberTable from "./ContactTeamMemberTable";
 
 type FieldDescription = {
   key: string;
   label: string;
   width?: number;
+  link?: 'mailto' | 'href';
 };
 
 type Props = RouteComponentProps<{ id: string }>;
@@ -101,10 +102,10 @@ export default class ContactEdit extends React.Component<Props, State> {
   saveSection = (nextSection: string | null = null, changes: {} | null = null) => {
     const { value } = this.state
     changes = changes || this.state.changes
-    const url = value.id ? `/contacts/${value.id}` : '/contacts'
+    const url = value.id ? `/contacts/${value.id}` : '/contacts/'
 
     api.post(url, [changes])
-      .then(response => this.setState({value: response.data.items[0], changes: [], expandedSection: nextSection}))
+      .then(response => this.setState({ value: response.data.items[0], changes: {}, expandedSection: nextSection}))
   }
 
   renderSection = (label: string, icon: string, fields: FieldDescription[]) => {
@@ -121,12 +122,18 @@ export default class ContactEdit extends React.Component<Props, State> {
         >
           <List>
             {setFields.map(field => {
+              const attribs = {} as any
+              if (field.link === 'mailto' && value[field.key]) {
+                attribs.href = 'mailto:' + value[field.key];
+                attribs.tag = 'a'
+              }
               return <SimpleListItem
                 className={field.width ? "field narrow" : "field wide"}
                 key={field.key}
                 graphic={icon}
                 text={value[field.key]}
                 secondaryText={field.label}
+                { ...attribs }
               />
             })}
             {setFields.length === 0 && (
@@ -262,7 +269,7 @@ export default class ContactEdit extends React.Component<Props, State> {
       <AppFrame bodyClass="primary grey">
         <div className="contact-header">
           <h1 className="mdc-typography--headline4">{this.getTitle()}</h1>
-          <SimpleChip leadingIcon="email" text="Email" />
+          <ContactTags value={value} onUpdate={this.onUpdate} />
         </div>
         <div className="contact-body">
             {this.renderSection("Person", "person", [
@@ -279,8 +286,8 @@ export default class ContactEdit extends React.Component<Props, State> {
           { this.renderOpenHouse() }
 
           {this.renderSection("Email", "email", [
-            { key: "email_personal", label: "Personal" },
-            { key: "email_work", label: "Work" }
+            { key: "email_personal", label: "Personal", link: 'mailto' },
+            { key: "email_work", label: "Work", link: 'mailto' }
           ])}
           {this.renderSection("Phone", "phone", [
             { key: "phone_mobile", label: "Mobile", width: 50 },

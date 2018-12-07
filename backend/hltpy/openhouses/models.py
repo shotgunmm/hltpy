@@ -18,7 +18,10 @@ class OpenHouse(models.Model):
     list_price = models.DecimalField(max_digits=8, decimal_places=2)
     mls_id = models.CharField(max_length=255)
     completed = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='openhouses', blank=True, null=True)
+    image = models.ImageField(upload_to='openhouses/images', blank=True, null=True)
+
+    brochure = models.FileField(upload_to='openhouses/brochures', blank=True, null=True)
+
     deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

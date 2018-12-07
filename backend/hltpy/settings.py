@@ -142,6 +142,11 @@ STATIC_URL = '/static/'
 
 LARAVEL_SESSION_COOKIE = 'laravel_session'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_FROM_NAME = 'Better Living Real Estate'
+EMAIL_FROM_ADDRESS = 'support@betterlivingre.com'
+
+
 try:
     from .local_settings import *
 except ImportError:
