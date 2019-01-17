@@ -44,6 +44,7 @@ class Contact(models.Model):
     phone_mobile = models.CharField(max_length=255, blank=True, null=True)
     phone_home = models.CharField(max_length=255, blank=True, null=True)
     phone_work = models.CharField(max_length=255, blank=True, null=True)
+    phone_work_extension = models.CharField(max_length=255, blank=True, null=True)
     phone_times = models.CharField(max_length=255, blank=True, null=True)
 
     email_personal = models.CharField(max_length=255, blank=True, null=True)
@@ -55,16 +56,8 @@ class Contact(models.Model):
     address_zip = models.CharField(max_length=5, blank=True, null=True)
 
     open_house_visit = models.ForeignKey('openhouses.OpenHouse', blank=True, null=True, on_delete=models.SET_NULL)
-    agent_name = models.CharField(max_length=512, blank=True, null=True)
-    agent_company = models.CharField(max_length=128, blank=True, null=True)
-    agent_phone = models.CharField(max_length=100, blank=True, null=True)
-    agent_email = models.CharField(max_length=512, blank=True, null=True)
 
     mortgage_qualified = models.BooleanField(default=False)
-    mortgage_broker = models.CharField(max_length=512, blank=True, null=True)
-    mortgage_company = models.CharField(max_length=128, blank=True, null=True)
-
-    buyer_name = models.CharField(max_length=512, blank=True, null=True)
 
     company = models.CharField(max_length=255, blank=True, null=True)
     position = models.CharField(max_length=255, blank=True, null=True)
@@ -79,12 +72,11 @@ class Contact(models.Model):
     objects = ContactManager()
 
     EDITABLE_FIELDS = ['first_name', 'last_name', 'state',
-                         'phone_mobile', 'phone_home', 'phone_work',
+                         'phone_mobile', 'phone_home', 'phone_work', 'phone_work_extension',
                          'phone_times', 'email_personal', 'email_work',
                          'address_street', 'address_city', 'address_state', 'address_zip',
-                         'agent_name', 'agent_company', 'agent_phone', 'agent_email',
-                         'mortgage_qualified', 'mortgage_broker', 'mortgage_company',
-                         'buyer_name', 'company', 'position']
+                         'mortgage_qualified',
+                         'company', 'position']
     READONLY_FIELDS = ['id', 'created', 'updated']
 
     SEARCH_FIELDS = ['first_name', 'last_name', 'state', 'phone_mobile', 'phone_home', 'email_personal',

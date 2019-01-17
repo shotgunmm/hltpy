@@ -126,7 +126,7 @@ export abstract class RelatedItemsEditor<Parent extends IdObject, Child extends 
 
   baseRender = () => {
     return <Elevation z={1} className={this.getCssClass()}>
-      <span className="mdc-typography--button">
+      <span className="mdc-typography--button section-header">
         { this.getSectionLabel() }
       </span>
 

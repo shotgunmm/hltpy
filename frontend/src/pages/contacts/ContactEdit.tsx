@@ -15,8 +15,10 @@ import ContactTeamMemberTable from "./ContactTeamMemberTable";
 
 type FieldDescription = {
   key: string;
-  label: string;
+  label?: string;
+  divider?: boolean;
   width?: number;
+  icon?: string;
   link?: 'mailto' | 'href';
 };
 
@@ -46,10 +48,11 @@ export default class ContactEdit extends React.Component<Props, State> {
       })
     );
   };
+
   componentWillMount() {
     const { id } = this.props.match.params;
     this.setState({
-      value: {reminders: [], team_members: []} as any as Contact,
+      value: {reminders: [], team_members: [], tags: []} as any as Contact,
       saving: false,
       loading: true,
       expandedSection: null,
@@ -61,6 +64,7 @@ export default class ContactEdit extends React.Component<Props, State> {
       reminderDate: '',
       deleteOpen: false
     });
+
     if (id) {
       this.loadItem(id);
     } else {
@@ -120,6 +124,9 @@ export default class ContactEdit extends React.Component<Props, State> {
           z={1}
           onClick={this.setSection(label)}
         >
+          <span className="mdc-typography--button section-header">
+            {label}
+          </span>
           <List>
             {setFields.map(field => {
               const attribs = {} as any
@@ -130,9 +137,10 @@ export default class ContactEdit extends React.Component<Props, State> {
               return <SimpleListItem
                 className={field.width ? "field narrow" : "field wide"}
                 key={field.key}
-                graphic={icon}
+                graphic={field.icon}
                 text={value[field.key]}
                 secondaryText={field.label}
+                style={{width: `${(field.width || 100) - 5}%`}}
                 { ...attribs }
               />
             })}
@@ -148,32 +156,27 @@ export default class ContactEdit extends React.Component<Props, State> {
       );
     } else {
 
-      let lastValueSet = true;
-
       return (
         <Elevation key={label} className="contact-section contact-section-edit" z={6}>
-          <span className="mdc-typography--button">
+          <span className="mdc-typography--button section-header">
             {label}
           </span>
-          <Button onClick={() => this.saveSection()}>
-            <ButtonIcon>save</ButtonIcon> Save
+          <Button raised onClick={() => this.saveSection()}>
+            Save
           </Button>
           {saving ? <CircularProgress /> :
             <List>
               {fields.map(field => {
-                if (!lastValueSet) {
-                  return []
+                if (field.divider) {
+                  return <div className="full-width" key={field.key} />
                 } else {
-                  lastValueSet = !!value[field.key]
-                  // const thisIcon = lastIcon === icon ? undefined : icon;
-
                   return <div key={field.key}
                     className={field.width ? "field narrow" : "field wide"}
-                    style={{width: field.width ? `${field.width * 0.8}%` : "80%"}}
+                    style={{ width: field.width ? `${field.width * 0.8}%` : "80%" }}
                   >
                     <TextField
-                      style={{width: "100%"}}
-                      withLeadingIcon={icon}
+                      style={{ width: "100%" }}
+                      withLeadingIcon={field.icon}
                       key={field.key}
                       label={field.label}
                       value={value[field.key] || ""}
@@ -188,22 +191,6 @@ export default class ContactEdit extends React.Component<Props, State> {
       );
     }
   };
-
-  setNote = (event: any) => this.setState({newNote: event.target.value || ' ' })
-
-  saveNote = (event: any) => {
-    const { value, newNote } = this.state
-    if (!value.id) {
-      alert("Please save this contact before creating a note.");
-      return;
-    }
-    if (newNote.length > 1) {
-      api.post(`/contacts/${value.id}`, { note: newNote })
-        .then(response => this.setState({value: response.data.item, newNote: ''}))
-    } else {
-      this.setState({newNote: ''})
-    }
-  }
 
   showDelete = () => {
     this.setState({ deleteOpen: true })
@@ -272,11 +259,24 @@ export default class ContactEdit extends React.Component<Props, State> {
           <ContactTags value={value} onUpdate={this.onUpdate} />
         </div>
         <div className="contact-body">
-            {this.renderSection("Person", "person", [
-              { key: "first_name", label: "First Name", width: 50 },
-              { key: "last_name", label: "Last Name", width: 50 },
-              { key: "company", label: "Company", width: 50 },
-              { key: "buyer_name", label: "On Behalf Of", width: 50 },
+            {this.renderSection('Person', 'person', [
+              { key: 'first_name', label: 'First Name', width: 50, icon: 'person' },
+              { key: 'last_name', label: 'Last Name', width: 50, icon: 'person' },
+              { key: 'company', label: 'Company', width: 100, icon: 'business' },
+              { divider: true, key: 'div1' },
+              { key: 'email_work', label: 'Work', link: 'mailto', width: 50, icon: 'email' },
+              { key: 'email_personal', label: 'Personal', link: 'mailto', width: 50, icon: 'email' },
+              { divider: true, key: 'div2' },
+              { key: 'phone_work', label: 'Work Phone', width: 40, icon: 'phone' },
+              { key: 'phone_work_extension', label: 'Extension', width: 10 },
+              { key: 'phone_mobile', label: 'Mobile', width: 50, icon: 'phone' },
+              { key: 'phone_home', label: 'Home', width: 50, icon: 'phone' },
+              { key: 'phone_times', label: 'Best time to call', width: 50, icon: 'phone' },
+              { divider: true, key: 'div3' },
+              { key: 'address_street', label: 'Street Address', icon: 'location_on' },
+              { key: 'address_city', label: 'City', width: 50, icon: 'location_on' },
+              { key: 'address_state', label: 'State', width: 20, icon: 'location_on' },
+              { key: 'address_zip', label: 'Zip', width: 30, icon: 'location_on' }
             ])}
 
           <ContactRemindersSection value={value} onUpdate={this.onUpdate} />
@@ -285,24 +285,8 @@ export default class ContactEdit extends React.Component<Props, State> {
 
           { this.renderOpenHouse() }
 
-          {this.renderSection("Email", "email", [
-            { key: "email_personal", label: "Personal", link: 'mailto' },
-            { key: "email_work", label: "Work", link: 'mailto' }
-          ])}
-          {this.renderSection("Phone", "phone", [
-            { key: "phone_mobile", label: "Mobile", width: 50 },
-            { key: "phone_home", label: "Home", width: 50 },
-            { key: "phone_times", label: "Best time to call" }
-          ])}
-
           <ContactTeamMemberTable contact={value} onUpdate={this.onUpdate} />
 
-          {this.renderSection("Home Address", "location_on", [
-            { key: "address_street", label: "Street Address" },
-            { key: "address_city", label: "City", width: 50, },
-            { key: "address_state", label: "State", width: 20, },
-            { key: "address_zip", label: "Zip", width: 30 }
-          ])}
           {this.renderDelete()}
         </div>
       </AppFrame>

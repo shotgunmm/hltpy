@@ -1,4 +1,5 @@
-import { Chip, ChipSet } from '@rmwc/chip';
+import Button, { ButtonIcon } from '@rmwc/button';
+import { Chip } from '@rmwc/chip';
 import { SimpleDialog } from '@rmwc/dialog';
 import TextField from '@rmwc/textfield';
 import * as React from 'react';
@@ -26,12 +27,14 @@ export class ContactTags extends React.Component<Props, State> {
     const { newTagValue } = this.state
     const { value, onUpdate } = this.props
 
-    api
-      .post(`/contacts/${value.id}/tags`, {tag: newTagValue})
-      .then(response => {
-        onUpdate(response.data.item)
-        this.setState({showDialog: false})
-      })
+    if (newTagValue.length) {
+      api
+        .post(`/contacts/${value.id}/tags`, { tag: newTagValue })
+        .then(response => {
+          onUpdate(response.data.item)
+        })
+    }
+    this.setState({showDialog: false})
   }
 
   setTagName = (evt: any) => {
@@ -50,12 +53,12 @@ export class ContactTags extends React.Component<Props, State> {
     const { newTagValue, showDialog } = this.state
 
     return <div>
-        <ChipSet>
+      <div className="tag-list">
         {value.tags.map(tag =>
           <Chip key={tag.id} trailingIcon="close">{tag.tag}</Chip>
         )}
-        <Chip leadingIcon="create" onClick={() => this.newTag()} key="_create"/>
-      </ChipSet>
+        <Button onClick={this.newTag}><ButtonIcon icon="add" />Add Tags</Button>
+      </div>
       <SimpleDialog
         open={showDialog}
         title="Add Tag"

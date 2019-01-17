@@ -15,9 +15,29 @@ body {
 
 $primary: #1976d2;
 
+
+.tag-list {
+  overflow: hidden;
+
+  * {
+    display: block;
+    float: left;
+    margin-right: 5px;
+  }
+
+  button {
+    color: #c5cae9 !important;
+  }
+}
+
 .mdc-top-app-bar {
   color: $primary;
   background: white;
+
+  .mdc-top-app-bar__navigation-icon {
+    color: black;
+    margin: 10px 0 0 10px;
+  }
 }
 
 .mdc-drawer {
@@ -73,7 +93,6 @@ table {
   .mdc-drawer-app-content {
     flex-grow: 10;
     flex: 1;
-    margin-left: 255px;
     min-height: 100vh;
     &.grey {
       background: #efebe9;
@@ -117,6 +136,17 @@ table {
     margin-right: 0.5rem;
   }
 
+  .field.narrow {
+    float: left;
+    margin: 0 !important;
+  }
+
+}
+
+.full-width {
+  width: 100%;
+  color: white;
+  margin: 15px 0;
 }
 
 .contact-section-edit {
@@ -126,15 +156,16 @@ table {
   .mdc-text-field {
     background: white;
   }
-  .mdc-text-field__input{
-    padding-left: 68px;
-  }
- .mdc-floating-label {
+ .rwmc-icon + .mdc-floating-label {
    padding-left: 20px;
  }
- .mdc-floating-label--float-above {
+ .rmwc-icon + .mdc-floating-label--float-above {
    padding-left: 26px;
  }
+}
+
+.section-header {
+  margin: 0 12px;
 }
 
 .favorite {
@@ -190,6 +221,9 @@ table {
   width: 100%;
   table {
     width: 80%;
+    td { 
+      font-size: 16px;
+    }
   }
   overflow: hidden;
   clear: both;
@@ -203,8 +237,18 @@ table {
   width: 150px;
 }
 
-.icon-col {
+td.icon-col {
   width: 17px;
+  padding-left: 16px !important;
+}
+
+.inner-table.team-members {
+  table {
+    width: 100%;
+  }
+  td {
+    vertical-align: middle !important;
+  }
 }
 
 .dateline {
@@ -250,7 +294,7 @@ table {
 
 .mdc-top-app-bar {
   .title {
-    max-width: 230px;
+    max-width: 175px;
   }
   .logo {
     width: 120px;

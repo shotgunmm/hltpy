@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import OpenHouse
 from ..contacts.models import Contact
+from .models import OpenHouse
+
 
 @login_required
 def kiosk_enter(request, house_key):
@@ -34,16 +35,26 @@ def kiosk_form(request, house_key, kind):
             if value:
                 setattr(contact, field, value)
 
-        if request.POST.get('agent_first_name'):
-            contact.agent_name = "{} {}".format(request.POST.get('agent_first_name'), request.POST.get('agent_last_name'))
+        agent_data = {k.split('[')[1].strip(']'): v for k,v in request.POST.items() if k.startswith('agent[')}
+        if 'first_name' in agent_data and 'last_name' in agent_data:
+            agent_data['name'] = "{} {}".format(agent_data['first_name'], agent_data['last_name'])
+
+        agent_data = filter_fields(agent_data, ContactTeamMember.EDITABLE_FIELDS)
+        mortgage_data = {k.split('[')[1].strip(']'): v for k,v in request.POST.items() if k.startswith('mortgage[')}
+        mortgage_data = filter_fields(mortgage_data, ContactTeamMember.EDITABLE_FIELDS)
+
+        if len(agent_data):
+            contact.team_member_set.create(**agent_data)
+
+        if len(mortgage_data):
+            contact.team_member_set.create(**mortgage_data)
 
         contact.mortage_qualified = request.POST.get('mortgage_qualified') == 'true'
         contact.save()
 
+
         return redirect(open_house.kiosk_url())
 
 
-
-
-
-
+def send_customer_email(contact, open_house):
+    pass

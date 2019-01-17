@@ -1,4 +1,4 @@
-import Button from "@rmwc/button";
+import Button, { ButtonIcon } from "@rmwc/button";
 import { DataTable, DataTableBody, DataTableCell, DataTableContent, DataTableRow } from "@rmwc/data-table";
 import { Elevation } from "@rmwc/elevation";
 import Icon from "@rmwc/icon";
@@ -77,7 +77,7 @@ export default class ContactTeamMemberTable extends React.Component<Props, State
         { member.company }
       </DataTableCell>
       <DataTableCell>
-        { member.email} 
+        {member.email ? <a href={`mailto:${member.email}`}>{member.email}</a> : ''}
       </DataTableCell>
       <DataTableCell>
         { member.phone_number }
@@ -91,7 +91,7 @@ export default class ContactTeamMemberTable extends React.Component<Props, State
 
   renderEditor = (member: ContactTeamMember) => {
     return <DataTableRow key={member.id}>
-      <DataTableCell />
+      <DataTableCell className="icon-col" />
       <DataTableCell>
         <Select outlined label="Role" options={ROLE_CHOICES} value={member.role} onChange={this.setField('role')}/>
       </DataTableCell>
@@ -119,12 +119,12 @@ export default class ContactTeamMemberTable extends React.Component<Props, State
     const { newMember, editingMember } = this.state
 
     return <Elevation z={1} className="contact-section team-members">
-      <span className="mdc-typography--button">
+      <span className="mdc-typography--button section-header">
         Customer Team Members 
       </span>
 
       {contact.team_members !== [] &&
-        <DataTable className="inner-table">
+        <DataTable className="inner-table team-members">
           <DataTableContent>
             <DataTableBody>
               {contact.team_members.map(m => {
@@ -139,7 +139,9 @@ export default class ContactTeamMemberTable extends React.Component<Props, State
           </DataTableContent>
         </DataTable>
       }
-      { !editingMember && <IconButton icon="group_add" onClick={() => this.startEdit(null)} /> }
+      {!editingMember && <Button className="section-header" onClick={() => this.startEdit(null)}>
+        <ButtonIcon icon="group_add" />Add Team Member
+      </Button>}
     </Elevation>
   }
 }

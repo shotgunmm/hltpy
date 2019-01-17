@@ -15,6 +15,8 @@ def choice(value, *opts):
     else:
         return opts[0]
 
+def allow_fields(value, *opts):
+    return {k: v for k, v in value.items if k in opts}
 
 
 def JsonBodyMiddleware(get_response):

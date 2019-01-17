@@ -1,4 +1,4 @@
-import { Button, ButtonIcon } from '@rmwc/button';
+import { Button } from '@rmwc/button';
 import { List, ListItem, ListItemGraphic, ListItemMeta, ListItemPrimaryText, ListItemSecondaryText, ListItemText, SimpleListItem } from '@rmwc/list';
 import TextField from '@rmwc/textfield';
 import * as moment from 'moment';
@@ -63,7 +63,7 @@ export default class ContactRemindersSection extends RelatedItemsEditor<Contact,
         value={reminder.date}
         onChange={this.setField('date')}
       />
-      <Button onClick={this.saveChild}><ButtonIcon icon="save" /> Save</Button>
+      <Button raised onClick={this.saveChild}>Save</Button>
     </ListItem>
   }
 

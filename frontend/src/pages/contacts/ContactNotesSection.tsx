@@ -1,4 +1,4 @@
-import Button, { ButtonIcon } from "@rmwc/button";
+import Button from "@rmwc/button";
 import Checkbox from "@rmwc/checkbox";
 import { DataTableCell, DataTableRow } from "@rmwc/data-table";
 import Icon from "@rmwc/icon";
@@ -46,7 +46,7 @@ export default class ContactNotesSection extends RelatedItemsEditor<Contact, Con
         <TextField textarea label="Note Text" value={value.text} onChange={this.setField('text')} />
       </DataTableCell>
       <DataTableCell className="dateline">
-        <Button raised onClick={this.saveChild}><ButtonIcon icon="save" />Save</Button>
+        <Button raised onClick={this.saveChild}>Save</Button>
         <br /> <br />
         <Checkbox label="Share note with team members" checked={value.shared} onChange={this.setField('shared')} />
       </DataTableCell>
